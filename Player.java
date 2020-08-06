@@ -11,7 +11,7 @@ public class Player {
 		this.name = name;
 	}
 	public String getName() {return name;} //player의 이름 반환
-	void setFirst(boolean isFirst) { this.first = first;}
+	void setFirst(boolean first) { this.first = first;}
 	boolean isFirst() { return this.first;}
 	void setCardList(Vector<Card> cardList) { this.cardList = cardList; }
 
@@ -24,6 +24,7 @@ public class Player {
 
 	public void showCards() {
 		if ( cardList != null) {
+			System.out.print(name + ": ");
 			Iterator<Card> iter = cardList.iterator();
 			while (iter.hasNext())
 				System.out.print(iter.next() +" ");
@@ -31,4 +32,3 @@ public class Player {
 		}
 	} //cardList의 카드들을 모두 출력
 }
-
