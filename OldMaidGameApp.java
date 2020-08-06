@@ -4,11 +4,11 @@ public class OldMaidGameApp {
 	/**
 	 *  게임 진행 관련 변수, 메소드
 	 */
-	Scanner scanner = new Scanner(System.in);
-	boolean running = true;  // 전체 게임의 진행중 여부를 나타내는 변수.
-	boolean winner  = false; // 승자가 나오면 상태가 true로 바뀌도록 하기
-	int totalPlayer = 2;	 // 전체 플레이어 수 나중에 조절가능
-	int rangeOfCards   = 13;    // 카드 숫자 범위
+	Scanner scanner  = new Scanner(System.in);
+	boolean running  = true;  // 전체 게임의 진행중 여부를 나타내는 변수.
+	boolean winner   = false; // 승자가 나오면 상태가 true로 바뀌도록 하기
+	int totalPlayer  = 4;	  // 전체 플레이어 수 나중에 조절가능
+	int rangeOfCards = 13;    // 카드 숫자 범위
 	/*메소드*/
 	void end() { running = false; } // 게임 종료
 
@@ -16,14 +16,14 @@ public class OldMaidGameApp {
 	 *  플레이어 조작 관련 변수, 메소드
 	 */
 	ArrayList<Player> playerList = new ArrayList<>(totalPlayer);
-	Player currentPlayer; // 현재 턴을 진행 중인 플레이어
+	Player currentPlayer;  // 현재 턴을 진행 중인 플레이어
 	int currentNumber = 0; // 플레이어 리스트에서 순서
 	/*메소드*/
 	void nextPlayer() {
 		if(++currentNumber >= totalPlayer) // 마지막 유저
 			currentNumber = 0;
 		currentPlayer = playerList.get(currentNumber);
-	}  // 턴이 넘어갈 때마다 다음 플레이어로 변경
+	}  // currentPlayer를 다음 플레이어로 변경
 	void firstPlayer() {
 		for(int i = 0; i < totalPlayer; i++) {
 			currentPlayer = playerList.get(i);
@@ -32,7 +32,7 @@ public class OldMaidGameApp {
 				break;
 			}
 		}
-	} // 시작 플레이어 정함
+	} // currentPlayer를 시작 플레이어로 변경
 	void addPlayer(String name) { playerList.add(new Player(name)); } // 이름 입력받아 playerList에 player 추가
 
 	/**
@@ -73,11 +73,15 @@ public class OldMaidGameApp {
 			nextPlayer();
 		}
 	}
-	void dump() {} //player에게 뽑은 카드와 동일한 숫자 카드가 있는지 확인하고, 있으면 자동으로 그 두 장을 버림
-
+	void dump() {
+		/**
+		짝을 맞추어 자신의 카드 버리기
+		A부터 상대의 카드 랜덤 한 장 뽑기(A=홀수 장의 카드를 받은 플레이어)
+		A에게 뽑은 숫자와 같은 숫자 카드가 있으면 버리기, 없으면 그대로 턴 종료
+		 */
+	}
 
 	public void run() {
-
 		/** Game setting
 		 *  플레이어 수 설정, 카드 수 설정, Deck 생성
 		 *  초기 버전은 2로 초기화
@@ -85,30 +89,26 @@ public class OldMaidGameApp {
 		// 시작할 때 자동으로 이름이 Computer인 Player을 playerList에 추가해야 함
 		addPlayer("Computer");
 		System.out.print("당신의 이름: ");
-		addPlayer(scanner.nextLine()); // 사용자 추가
-		setDeck(rangeOfCards*4 +1);
+		addPlayer(scanner.nextLine()); // 유저 추가
+		setDeck(rangeOfCards*4 + 1);   // 덱 생성
+		addPlayer(scanner.nextLine()); // 유저 추가
+		addPlayer(scanner.nextLine()); // 유저 추가
 
-		while(running) { // !isRunning 은 "진행중이 아니라면" 뜻을 가져서 !를 안 쓰도록 수정
+		// 조커 찾기 게임을 진행
+		while(running) {
 			try {
-				/** Game Setting
-				 1. 카드 나눠주기
-				 2.
-				 3. 첫 번째 플레이어 지정
-				 */
+				// 1. 덱을 섞는다.
 				shuffle();
+				// 2. 시작 플레이어를 정한다.
 				firstPlayer();
+				// 3. 어떤 플레이어가 카드를 모두 버릴 때까지 게임을 진행한다.
 				System.out.println("도둑잡기 게임을 시작합니다.");
-				/*
+				// displayCards(); // 전체 카드 확인하고 싶을 때  주석 지워주세요
 				while(!winner) {
 				}
-				*/
-				for(int i=0; i<totalPlayer; i++) {
-					currentPlayer.showCards();
-					nextPlayer();
-				}
 
 
-				// 사용자에게 게임 재진행 여부 묻기
+				// 4.사용자에게 게임 재진행 여부 묻는다.
 				System.out.print("그만 하시겠습니까? (yes): ");
 				if(scanner.next().equals("yes")) end();
 				else { // 시작 플레이어 초기화
@@ -121,7 +121,17 @@ public class OldMaidGameApp {
 				end();
 			}
 		}
-	} //전체 게임 진행
+	}
+
+	/**
+	 * 테스트 관련 메소드
+	 */
+	public void displayCards() { // 각 플레이어가 가지고 있는 CardList의 카드를을 보여준다.
+		for(int i=0; i<totalPlayer; i++) {
+			currentPlayer.showCards();
+			nextPlayer();
+		}
+	}
 
 	public static void main(String[] args) {
 		var game = new OldMaidGameApp();
