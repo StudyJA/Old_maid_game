@@ -15,17 +15,17 @@ public class OldMaidGameApp {
 
 	// 플레이어 설정, 카드 범위 설정, 덱 생성
 	void gameSetting() {
-		System.out.println("조커 찾기 게임 설정을 진행합니다.");
-		System.out.print("플레이어 수: ");
+		System.out.println("Proceed to old maid game setup");
+		System.out.print("Total Player Counts?: ");
 		totalPlayer = scanner.nextInt();
-		System.out.print("카드 최대값: ");
+		System.out.print("Maximum value of Cards: ");
 		rangeOfCards = scanner.nextInt();
-		System.out.println("플레이어의 이름을 입력해주세요");
+		System.out.println("Please type your name");
 		// 이름이 Computer인 Player을 playerList에 추가
 		addPlayer("Computer", 0);
 		scanner.nextLine();
 		for(int i=1; i < totalPlayer; i++) {
-			System.out.print(i + "번째 플레이어의 이름: ");
+			System.out.print(i + " Player's name: ");
 			addPlayer(scanner.nextLine(), i);
 		}
 		setDeck(rangeOfCards*4 + 1);   // 덱 생성
@@ -116,7 +116,7 @@ public class OldMaidGameApp {
 			nextPlayer();
 			for (Card card : currentPlayer.cardList)
 				if (card.getNumber() == 0) {
-					System.out.println("조커는 " + currentPlayer.getName() + "가 가지고 있습니다.");
+					System.out.println(currentPlayer.getName() + " has the Joker!!!");
 					return;
 				}
 		}
@@ -133,7 +133,7 @@ public class OldMaidGameApp {
 				// 2. 시작 플레이어부터 게임을 시작한다.
 				firstPlayer();
 				// 3. 어떤 플레이어가 카드를 모두 버릴 때까지 게임을 진행한다.
-				System.out.println("도둑잡기 게임을 시작합니다.");
+				System.out.println("Let's play Old maid game!!");
 				while(!winner) {
 					System.out.print(currentPlayer.getName() + ": ");
 					currentPlayer.draw(prevPlayer);
@@ -141,12 +141,12 @@ public class OldMaidGameApp {
 						currentPlayer.showCards();
 					// 누군가 카드를 모두 버렸을 경우 승패를 결정한다.
 					if (prevPlayer.cardList.size() == 0) {
-						System.out.println(prevPlayer.getName() + "가 이겼습니다.");
+						System.out.println(prevPlayer.getName() + " is winner!!");
 						winner = true;
 						findJoker();
 					}
 					else if (currentPlayer.cardList.size() == 0) {
-						System.out.println(currentPlayer.getName() + "가 이겼습니다.");
+						System.out.println(currentPlayer.getName() + " is winner!!");
 						winner = true;
 						findJoker();
 					}
@@ -154,7 +154,7 @@ public class OldMaidGameApp {
 				}
 
 				// 4.사용자에게 게임 재진행 여부 묻는다.
-				System.out.print("그만 하시겠습니까? (yes): ");
+				System.out.print("Want game exit? (yes): ");
 				if(scanner.next().equals("yes")) end();
 				else { // 시작 플레이어 초기화
 					firstPlayer();

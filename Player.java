@@ -35,17 +35,17 @@ public class Player {
 	// 이전 플레이어에게 카드 한장을 받고 같은 숫자 카드 두개를 버린다.
 	void draw(Player prevPlayer) {
 		Card givenCard = prevPlayer.giveRandomCard(); // 이전 플레이어의 무작위 카드
-		System.out.println(prevPlayer.getName()+"에게 " + givenCard +"를 뽑았습니다.");
+		System.out.println(prevPlayer.getName()+ " to give " + givenCard +" get!");
 		System.out.print(name+": ");
 		// 플레이어의 카드리스트에서 같은 숫자를 찾아본다.
 		for(Card card: this.cardList)    
 			if(card.equals(givenCard)) { // 같은 숫자 카드가 있을 때
-				System.out.println("손에 있는 " + card + "와 " + givenCard + "를 버렸습니다.");
+				System.out.println( "Dump" + card + " and " + givenCard + "in hand");
 				this.cardList.remove(card);
 				return;
 			}
 		// 같은 숫자 카드가 없을 때
-		System.out.println("같은 숫자의 카드가 없습니다.");
+		System.out.println("There are no pair with same number");
 		cardList.add(givenCard);	
 	}
 
