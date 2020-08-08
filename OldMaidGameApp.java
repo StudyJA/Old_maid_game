@@ -97,7 +97,7 @@ public class OldMaidGameApp {
 
 		// 모든 인원이 똑같이 받는 카드들
 		for(int i=0; i<totalPlayer; i++) {
-			var bundle = deck.subList(startIndex, endIndex);
+			List<Card> bundle = deck.subList(startIndex, endIndex);
 			currentPlayer.setCardList(new Vector<Card>(bundle));
 			startIndex += shareCards;
 			endIndex   += shareCards;
@@ -169,7 +169,7 @@ public class OldMaidGameApp {
 	}
 
 	public static void main(String[] args) {
-		var game = new OldMaidGameApp();
+		OldMaidGameApp game = new OldMaidGameApp();
 		game.run();
 	}
 }
