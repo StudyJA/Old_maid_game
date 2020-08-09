@@ -156,9 +156,15 @@ public class OldMaidGameApp {
 				// 4.사용자에게 게임 재진행 여부 묻는다.
 				System.out.print("Would you like to exit game? (yes): ");
 				if(scanner.next().equals("yes")) end();
-				else { // 시작 플레이어 초기화
+				else { // 플레이어 정보는 놔두고 게임 초기화
 					firstPlayer();
-					currentPlayer.setFirst(false);
+					currentPlayer.setFirst(false); // 시작 플레이어 없앰
+					winner = false; 			   // 승자 없앰
+					Iterator<Player> iter = playerList.iterator();
+					while (iter.hasNext()) { // 플레이어가 가지고 있는 카드 모두 버림
+						Player player = iter.next();
+						player.cardList.clear();
+					}
 				}
 			}
 			catch (Exception e) { // 예외 발생 시 end()로 정상 종료 하도록 예외처리
