@@ -15,8 +15,8 @@ public class OldMaidGameApp {
 
 	// 플레이어 설정, 카드 범위 설정, 덱 생성
 	void gameSetting() {
-		System.out.println("Proceed to old maid game setup");
-		System.out.print("Total Player Counts?: ");
+		System.out.println("Game setting...");
+		System.out.print("How many player with you?: ");
 		totalPlayer = scanner.nextInt();
 		System.out.print("Maximum value of Cards: ");
 		rangeOfCards = scanner.nextInt();
@@ -154,7 +154,7 @@ public class OldMaidGameApp {
 				}
 
 				// 4.사용자에게 게임 재진행 여부 묻는다.
-				System.out.print("Want game exit? (yes): ");
+				System.out.print("Would you like to exit game? (yes): ");
 				if(scanner.next().equals("yes")) end();
 				else { // 시작 플레이어 초기화
 					firstPlayer();

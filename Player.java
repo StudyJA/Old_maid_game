@@ -40,7 +40,7 @@ public class Player {
 		// 플레이어의 카드리스트에서 같은 숫자를 찾아본다.
 		for(Card card: this.cardList)    
 			if(card.equals(givenCard)) { // 같은 숫자 카드가 있을 때
-				System.out.println( "Dump" + card + " and " + givenCard + "in hand");
+				System.out.println( "Dump" + card + " and " + givenCard + " in hand");
 				this.cardList.remove(card);
 				return;
 			}
