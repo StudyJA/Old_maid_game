@@ -1,12 +1,14 @@
 import java.util.*;
 
 public class Player {
-	private String name;  // ì´ë¦„
-	private int location; // ê²Œì„ ë³´ë“œì—ì„œ ìœ„ì¹˜
-	private boolean first = false; // ì‹œì‘ í”Œë ˆì´ì–´ì¸ì§€ í™•ì¸
-	private int score = 0;  // ì ìˆ˜
-	List<Card> cardList; 	// í”Œë ˆì´ì–´ê°€ ê°€ì§€ê³  ìˆëŠ” ì¹´ë“œë“¤
+	// User Å¬·¡½º¿¡¼­ »ç¿ëÇÏ±â À§ÇØ name°ú locationÀ» protected·Î º¯°æ
+	protected String name;  // ÀÌ¸§
+	protected int location; // °ÔÀÓ º¸µå¿¡¼­ À§Ä¡
+	private boolean first = false; // ½ÃÀÛ ÇÃ·¹ÀÌ¾îÀÎÁö È®ÀÎ
+	private int score = 0;  // Á¡¼ö
+	List<Card> cardList; 	// ÇÃ·¹ÀÌ¾î°¡ °¡Áö°í ÀÖ´Â Ä«µåµé
 
+	Player() {} // ±âº» »ı¼ºÀÚ Ãß°¡
 	Player (String name, int location) {
 		this.name = name;
 		this.location = location;
@@ -16,13 +18,14 @@ public class Player {
 	public void setFirst(boolean first) { this.first = first; }
 	public boolean isFirst() { return this.first; }
 	public void setCardList(List<Card> cardList) { this.cardList = cardList; }
+	public void plusScore() { this.score++; } // Á¡¼ö¸¦ 1Á¡ ¿Ã¸°´Ù.
 
-	// cardListì—ì„œ ì¹´ë“œë¥¼ ì‚­ì œí•˜ê³  ë°˜í™˜í•œë‹¤.
-	Card giveRandomCard() {
+	// ÀÌÀü ÇÃ·¹ÀÌ¾îÀÇ cardList¿¡¼­ ·£´ıÇÑ Ä«µå ÇÑ ÀåÀ» »èÁ¦ÇÏ°í ±×¸¦ ¹İÈ¯ÇÑ´Ù.
+	Card giveRandomCard(Player prevPlayer) {
 		Card card = null;
 		int index = 0;
-		int i = (int)(Math.random()*cardList.size());
-		for(Iterator<Card> iter = cardList.iterator();iter.hasNext();) {
+		int i = (int)(Math.random()*prevPlayer.cardList.size());
+		for(Iterator<Card> iter = prevPlayer.cardList.iterator();iter.hasNext();) {
 			card = iter.next();
 			if (index++ == i) {
 				iter.remove();
@@ -32,31 +35,51 @@ public class Player {
 		return card;
 	}
 
-	// ì´ì „ í”Œë ˆì´ì–´ì—ê²Œ ì¹´ë“œ í•œì¥ì„ ë°›ê³  ê°™ì€ ìˆ«ì ì¹´ë“œ ë‘ê°œë¥¼ ë²„ë¦°ë‹¤.
+	// ÀÌÀü ÇÃ·¹ÀÌ¾î¿¡°Ô Ä«µå ÇÑ ÀåÀ» ¹Ş°í °°Àº ¼ıÀÚ Ä«µå µÎ °³¸¦ ¹ö¸®¸ç, ÀÌ °úÁ¤ÀÌ Ãâ·ÂµÇÁö ¾Êµµ·Ï ÇÑ´Ù.
 	void draw(Player prevPlayer) {
-		Card givenCard = prevPlayer.giveRandomCard(); // ì´ì „ í”Œë ˆì´ì–´ì˜ ë¬´ì‘ìœ„ ì¹´ë“œ
-		System.out.println(prevPlayer.getName()+ " to give " + givenCard +" get!");
-		System.out.print(name+": ");
-		// í”Œë ˆì´ì–´ì˜ ì¹´ë“œë¦¬ìŠ¤íŠ¸ì—ì„œ ê°™ì€ ìˆ«ìë¥¼ ì°¾ì•„ë³¸ë‹¤.
+		Card givenCard = giveRandomCard(prevPlayer); // ÀÌÀü ÇÃ·¹ÀÌ¾îÀÇ ¹«ÀÛÀ§ Ä«µå
+		System.out.println("took a card from "+prevPlayer.getName());
+		// ÇÃ·¹ÀÌ¾îÀÇ Ä«µå¸®½ºÆ®¿¡¼­ °°Àº ¼ıÀÚ¸¦ Ã£¾Æº»´Ù.
 		for(Card card: this.cardList)    
-			if(card.equals(givenCard)) { // ê°™ì€ ìˆ«ì ì¹´ë“œê°€ ìˆì„ ë•Œ
-				System.out.println( "Dump" + card + " and " + givenCard + " in hand");
+			if(card.equals(givenCard)) { // °°Àº ¼ıÀÚ Ä«µå°¡ ÀÖÀ» ¶§
+				System.out.println("Dump " + card + " and " + givenCard + " from hand");
 				this.cardList.remove(card);
 				return;
 			}
-		// ê°™ì€ ìˆ«ì ì¹´ë“œê°€ ì—†ì„ ë•Œ
-		System.out.println("There are no pair with same number");
+		// °°Àº ¼ıÀÚ Ä«µå°¡ ¾øÀ» ¶§
 		cardList.add(givenCard);	
 	}
-
-	// cardListì˜ ì¹´ë“œë¥¼ ëª¨ë‘ ë³´ì—¬ì¤€ë‹¤.
+	
+	// cardListÀÇ Ä«µå°¡ ¸î ÀåÀÎÁö Ãâ·ÂÇÑ´Ù.
 	public void showCards() {
-		if (cardList != null) {
-			System.out.print(name + ": ");
-			Iterator<Card> iter = cardList.iterator();
-			while (iter.hasNext())
-				System.out.print(iter.next() +" ");
-			System.out.println();
+		System.out.print(name + ": has " + cardList.size() + " cards");
+		System.out.println();
+	}
+	
+	// ÀÚ½ÅÀÌ °¡Áø Ä«µå Áß Áßº¹ ¼ıÀÚ Ä«µå¸¦ ¸ğµÎ ¹ö¸°´Ù.
+	public void dumpAll() {
+		boolean checkedAll=false;
+		int j=0;
+		while(!checkedAll) {
+			if(j>=cardList.size()-1) {
+				checkedAll=true;
+				continue;
+			}
+			else {
+				Card card1 = cardList.get(j);
+				for(int i=j+1; i < cardList.size(); i++) {
+					Card card2 = cardList.get(i);
+					if(card1.equals(card2)) { // °°Àº ¼ıÀÚ Ä«µå°¡ ÀÖÀ» ¶§
+						System.out.print(getName()+": ");
+						System.out.println("Dump " + card1 + " and " + card2 + " from hand");
+						//card1, card2¸¦ cardList¿¡¼­ »èÁ¦
+						this.cardList.remove(j);
+						this.cardList.remove(i);
+						break;
+					}
+					j++;
+				}
+			}
 		}
-	} 
+	}
 }

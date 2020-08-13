@@ -1,6 +1,6 @@
 public class Card {
-	private int number;    // 1~13ê¹Œì§€ì˜ ìˆ˜, 0(ì¡°ì»¤)
-	private String shape;  // ë‹¤ì´ì•„ëª¬ë“œ, í•˜íŠ¸, ìŠ¤í˜ì´ë“œ, í´ë¡œë²„, ì¡°ì»¤
+	private int number;    // 1~13±îÁöÀÇ ¼ö, 0(Á¶Ä¿)
+	private String shape;  // ´ÙÀÌ¾Æ¸óµå, ÇÏÆ®, ½ºÆäÀÌµå, Å¬·Î¹ö, Á¶Ä¿
 
 	Card (String shape, int number) {
 		this.shape = shape;
@@ -17,11 +17,11 @@ public class Card {
 			return true;
 		else
 			return false;
-	} // ë‘ ê°œì˜ ì¹´ë“œì˜ ìˆ«ìê°€ ê°™ìœ¼ë©´ true ë°˜í™˜
+	} // µÎ °³ÀÇ Ä«µåÀÇ ¼ıÀÚ°¡ °°À¸¸é true ¹İÈ¯
 	@Override
 	public String toString() {
 		return this.shape + this.number;
 	} 
-	// Playerê°€ Cardë¥¼ êµ³ì´ ìƒì†ë°›ì„ í•„ìš”ê°€ ì—†ì„ ê²ƒ ê°™ì•„ìš” ë‚˜ì¤‘ì— Userì™€ Computerê°€ ì„œë¡œ ë‚˜ëˆ ì§„ë‹¤ë©´ ê·¸ë•Œ
-	// Playerë¥¼ ìƒì†ë°›ì„ ìˆ˜ ìˆê² ë„¤ìš”!
+	// Player°¡ Card¸¦ ±»ÀÌ »ó¼Ó¹ŞÀ» ÇÊ¿ä°¡ ¾øÀ» °Í °°¾Æ¿ä ³ªÁß¿¡ User¿Í Computer°¡ ¼­·Î ³ª´²Áø´Ù¸é ±×¶§
+	// Player¸¦ »ó¼Ó¹ŞÀ» ¼ö ÀÖ°Ú³×¿ä!
 }
