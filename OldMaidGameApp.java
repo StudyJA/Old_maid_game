@@ -16,18 +16,17 @@ public class OldMaidGameApp {
 	// 플레이어 설정, 카드 범위 설정, 덱 생성
 	void gameSetting() {
 		System.out.println("Game setting...");
-		System.out.print("How many player with you?: ");
+		System.out.print("How many players with you?: ");
 		totalPlayer = scanner.nextInt();
 		System.out.print("Maximum value of Cards: ");
 		rangeOfCards = scanner.nextInt();
 		System.out.println("Please type your name");
-		// 이름이 Computer인 Player을 playerList에 추가
-		addPlayer("Computer", 0);
+		System.out.print("Player's name: ");
 		scanner.nextLine();
+		addUser(scanner.nextLine(), 0);
 		for(int i=1; i < totalPlayer; i++) {
-			System.out.print(i + " Player's name: ");
-			addPlayer(scanner.nextLine(), i);
-		}
+			addPlayer("Computer"+i, i);
+		} // User 한 명을 제외한 만큼의 수의 Player Computer'n'을 자동으로 playerList에 추가
 		setDeck(rangeOfCards*4 + 1);   // 덱 생성
 	}
 
@@ -65,6 +64,10 @@ public class OldMaidGameApp {
 	void addPlayer(String name, int location) {
 		playerList.add(new Player(name, location));
 	}
+	// addPlayer와 같은 역할로, User 플레이어 생성
+	void addUser(String name, int location) {
+		playerList.add(new User(name, location));
+	}
 
 	/**
 	 *  카드 조작 관련 변수, 메소드
@@ -82,8 +85,8 @@ public class OldMaidGameApp {
 	}
 
 	/*
-	 * 플레이어에게 카드를 나눠주는 shuffle 입니다.
-	 * 카드를 더 많이 받은 한명의 플레이어의 first를 true로 설정합니다.
+	 * 플레이어에게 카드를 나눠주는 shuffle
+	 * 카드를 더 많이 받은 플레이어 한 명의 first를 true로 설정
 	 */
 	void shuffle() {
 		Collections.shuffle(this.deck);
@@ -110,13 +113,14 @@ public class OldMaidGameApp {
 		}
 	}
 
-	// 조커를 가지고 있는 플레이어를 찾는다.
+	// Search a player who has joker
 	void findJoker() {
 		for(int i=0; i < totalPlayer; i++) {
 			nextPlayer();
 			for (Card card : currentPlayer.cardList)
 				if (card.getNumber() == 0) {
-					System.out.println(currentPlayer.getName() + " has the Joker!!!");
+					System.out.println(currentPlayer.getName() + " has the Joker!");
+					currentPlayer.minusScore();
 					return;
 				}
 		}
@@ -128,20 +132,27 @@ public class OldMaidGameApp {
 		// 조커 찾기 게임을 진행
 		while(running) {
 			try {
-				// 1. 덱을 섞는다.
+				// 1. 덱을 섞고, 중복 카드를 버린다.
 				shuffle();
+				
+				for(int i=0; i<totalPlayer; i++) {
+					playerList.get(i).dumpAll();
+				}
+				
 				// 2. 시작 플레이어부터 게임을 시작한다.
 				firstPlayer();
 				// 3. 어떤 플레이어가 카드를 모두 버릴 때까지 게임을 진행한다.
+				System.out.println("* * * * * * * * * * * * * * * * * * * *");
 				System.out.println("Let's play Old maid game!!");
 				while(!winner) {
+					System.out.println("- - - - - - - - - - - - - -");
 					System.out.print(currentPlayer.getName() + ": ");
 					currentPlayer.draw(prevPlayer);
-					if(!currentPlayer.getName().equals("Computer")) // 컴퓨터가 아니면 카드를 보여준다.
-						currentPlayer.showCards();
+					currentPlayer.showCards();
 					// 누군가 카드를 모두 버렸을 경우 승패를 결정한다.
 					if (prevPlayer.cardList.size() == 0) {
 						System.out.println(prevPlayer.getName() + " is winner!!");
+						prevPlayer.plusScore();
 						winner = true;
 						findJoker();
 					}
@@ -152,6 +163,7 @@ public class OldMaidGameApp {
 					}
 					nextPlayer();
 				}
+				System.out.println("* * * * * * * * * * * * * * * * * * * *");
 
 				// 4.사용자에게 게임 재진행 여부 묻는다.
 				System.out.print("Would you like to exit game? (yes): ");
