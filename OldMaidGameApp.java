@@ -1,201 +1,100 @@
 import java.util.*;
 
-public class OldMaidGameApp {
-	/**
-	 *  °ÔÀÓ ÁøÇà °ü·Ã º¯¼ö, ¸Ş¼Òµå
-	 */
+/**
+ *  ê²Œì„ì„ ì„¸íŒ…í•˜ê³  í„´ì„ ì§„í–‰í•˜ê³  ìŠ¹ìì™€ íŒ¨ìë¥¼ ê°€ë¦¬ê³  ì ìˆ˜ë¥¼ ê³„ì‚°í•  ë•Œ í•„ìš”í•œ ë©”ì†Œë“œë¥¼ ëª¨ì•„ë†“ì€ í´ë˜ìŠ¤
+ */
+public class OldMaidGameApp extends Thread {
+
 	Scanner scanner  = new Scanner(System.in);
-	boolean running  = true;  // ÀüÃ¼ °ÔÀÓÀÇ ÁøÇàÁß ¿©ºÎ¸¦ ³ªÅ¸³»´Â º¯¼ö.
-	boolean winner   = false; // ½ÂÀÚ°¡ ³ª¿À¸é »óÅÂ°¡ true·Î ¹Ù²îµµ·Ï ÇÏ±â
-	int totalPlayer  = 2;	  // ÀüÃ¼ ÇÃ·¹ÀÌ¾î ¼ö ³ªÁß¿¡ Á¶Àı°¡´É
-	int rangeOfCards = 13;    // Ä«µå ¼ıÀÚ ¹üÀ§
-	/*¸Ş¼Òµå*/
-	// °ÔÀÓ Á¾·á
+	boolean running  = true;  // ì „ì²´ ê²Œì„ì˜ ì§„í–‰ì¤‘ ì—¬ë¶€ë¥¼ ë‚˜íƒ€ë‚´ëŠ” ë³€ìˆ˜.
+	boolean winner   = false; // ìŠ¹ìê°€ ë‚˜ì˜¤ë©´ ìƒíƒœê°€ trueë¡œ ë°”ë€Œë„ë¡ í•˜ê¸°
+	ControlPlayer p  = new ControlPlayer();
+	ControlCard   c  = new ControlCard();
+
+	// ëˆ„êµ°ê°€ ì¹´ë“œë¥¼ ëª¨ë‘ ë²„ë ¸ì„ ê²½ìš° ìŠ¹ìì™€ íŒ¨ì ê²°ì • ë° ì ìˆ˜ ê³„ì‚°
+	void isWin(Player previousPlayer, Player currentPlayer) {
+		Player loser = p.findJoker();
+		if (previousPlayer.cardList.size() == 0) {
+			winner = true;
+			show(previousPlayer.getName() + " is winner!!");
+			previousPlayer.plusScore();
+			show(loser.getName() + " has Joker!");
+			loser.minusScore();
+		}
+		else if (currentPlayer.cardList.size() == 0) {
+			winner = true;
+			show(currentPlayer.getName() + " is winner!!");
+			currentPlayer.plusScore();
+			show(loser.getName() + " has Joker!");
+			loser.minusScore();
+		}
+	}
+
+	// ê²Œì„ ì¢…ë£Œ
 	void end() { running = false; }
 
-	// ÇÃ·¹ÀÌ¾î ¼³Á¤, Ä«µå ¹üÀ§ ¼³Á¤, µ¦ »ı¼º
+	// ì½˜ì†” ì¶œë ¥
+	void show(String msg) {
+		System.out.println(msg);
+	}
+
+	// í”Œë ˆì´ì–´ ì„¤ì •, ì¹´ë“œ ë²”ìœ„ ì„¤ì •, ë± ìƒì„±
 	void gameSetting() {
-		System.out.println("Game setting...");
-		System.out.print("How many players with you?: ");
-		totalPlayer = scanner.nextInt();
-		System.out.print("Maximum value of Cards: ");
-		rangeOfCards = scanner.nextInt();
-		System.out.println("Please type your name");
-		System.out.print("Player's name: ");
-		scanner.nextLine();
-		addUser(scanner.nextLine(), 0);
-		for(int i=1; i < totalPlayer; i++) {
-			addPlayer("Computer"+i, i);
-		} // User ÇÑ ¸íÀ» Á¦¿ÜÇÑ ¸¸Å­ÀÇ ¼öÀÇ Player Computer'n'À» ÀÚµ¿À¸·Î playerList¿¡ Ãß°¡
-		/*
-		 * ±âÁ¸ ÄÚµå
-		// ÀÌ¸§ÀÌ ComputerÀÎ PlayerÀ» playerList¿¡ Ãß°¡
-		addPlayer("Computer", 0);
-		scanner.nextLine();
-		for(int i=1; i < totalPlayer; i++) {
-			System.out.print("Player " + i + "'s name: ");
-			addPlayer(scanner.nextLine(), i);
-		}
-		*/
-		setDeck(rangeOfCards*4 + 1);   // µ¦ »ı¼º
-	}
+		synchronized (this) {
+			show("Game setting...");
 
-	/**
-	 *  ÇÃ·¹ÀÌ¾î Á¶ÀÛ °ü·Ã º¯¼ö, ¸Ş¼Òµå
-	 */
-	ArrayList<Player> playerList = new ArrayList<>(totalPlayer);
-	Player prevPlayer;     // ¹Ù·Î Àü ÅÏÀ» ÁøÇàÇÑ ÇÃ·¹ÀÌ¾î
-	Player currentPlayer;  // ÇöÀç ÅÏÀ» ÁøÇà ÁßÀÎ ÇÃ·¹ÀÌ¾î
-	/*¸Ş¼Òµå*/
-	// currentPlayer¸¦ ´ÙÀ½ ÇÃ·¹ÀÌ¾î·Î º¯°æ
-	void nextPlayer() {
-		prevPlayer = currentPlayer;
-		if(currentPlayer == playerList.get(totalPlayer - 1)) // ¸¶Áö¸· À¯Àú
-			currentPlayer = playerList.get(0);
-		else
-			currentPlayer = playerList.get(currentPlayer.getLocation() + 1);
-	}
-	
-	// currentPlayer¸¦ ½ÃÀÛ ÇÃ·¹ÀÌ¾î·Î º¯°æ
-	void firstPlayer() {   
-		for(int i = 0; i<totalPlayer; i++) {
-			currentPlayer = playerList.get(i);
-			if(currentPlayer.isFirst()){
-				if(i == 0)
-					prevPlayer = playerList.get(totalPlayer-1);
-				else
-					prevPlayer = playerList.get(i-1);
-				break;
-			}
-		}
-	} 
+			System.out.print("How many players with you?: ");
+			p.setTotalPlayer(scanner.nextInt());
 
-	// ÀÌ¸§°ú À§Ä¡¸¦ ¹Ş¾Æ ÇÃ·¹ÀÌ¾î »ı¼º
-	void addPlayer(String name, int location) {
-		playerList.add(new Player(name, location));
-	}
-	// addPlayer¿Í °°Àº ¿ªÇÒ·Î, User ÇÃ·¹ÀÌ¾î »ı¼º
-	void addUser(String name, int location) {
-		playerList.add(new User(name, location));
-	}
+			System.out.print("Range of Cards(1~?): ");
+			c.setRangeOfCards(scanner.nextInt());
 
-	/**
-	 *  Ä«µå Á¶ÀÛ °ü·Ã º¯¼ö, ¸Ş¼Òµå
-	 */
-	private Vector<Card> deck; // CardList¿Í °°Àº Vector·Î º¯°æ
-	/*¸Ş¼Òµå*/
-	void setDeck(int sizeOfDeck) {
-		String[] shapes = {"¡ß", "¢¾", "¢¼", "¢À"}; 
-		this.deck = new Vector<Card>(sizeOfDeck);
-		for(String shape : shapes)
-			for(int i=1; i <= rangeOfCards; i++) {
-				this.deck.add(new Card(shape, i));
-			}
-		this.deck.add(new Card("J", 0));
-	}
-
-	/*
-	 * ÇÃ·¹ÀÌ¾î¿¡°Ô Ä«µå¸¦ ³ª´²ÁÖ´Â shuffle ÀÔ´Ï´Ù.
-	 * Ä«µå¸¦ ´õ ¸¹ÀÌ ¹ŞÀº ÇÑ¸íÀÇ ÇÃ·¹ÀÌ¾îÀÇ first¸¦ true·Î ¼³Á¤ÇÕ´Ï´Ù.
-	 */
-	void shuffle() {
-		Collections.shuffle(this.deck);
-		int randNum = (int)(Math.random()*totalPlayer);
-		currentPlayer = playerList.get(randNum);
-		currentPlayer.setFirst(true);
-		int totalCards = rangeOfCards*4 + 1; // ÀüÃ¼ Ä«µå ¼ö
-		int shareCards = (int)(totalCards/totalPlayer);
-		int startIndex = 0;
-		int endIndex   = shareCards;
-
-		// ¸ğµç ÀÎ¿øÀÌ ¶È°°ÀÌ ¹Ş´Â Ä«µåµé
-		for(int i=0; i<totalPlayer; i++) {
-			List<Card> bundle = deck.subList(startIndex, endIndex);
-			currentPlayer.setCardList(new Vector<Card>(bundle));
-			startIndex += shareCards;
-			endIndex   += shareCards;
-			nextPlayer();
-		}
-		// ³ª¸ÓÁö Ä«µå
-		for(int i=0; i < totalCards%shareCards; i++) {
-			currentPlayer.cardList.add(deck.get(startIndex+i));
-			nextPlayer();
-		}
-	}
-
-	// Á¶Ä¿¸¦ °¡Áö°í ÀÖ´Â ÇÃ·¹ÀÌ¾î¸¦ Ã£´Â´Ù.
-	void findJoker() {
-		for(int i=0; i < totalPlayer; i++) {
-			nextPlayer();
-			for (Card card : currentPlayer.cardList)
-				if (card.getNumber() == 0) {
-					System.out.println(currentPlayer.getName() + " has the Joker!");
-					return;
-				}
+			show("Please type your name");
+			System.out.print("Player's name: ");
+			scanner.nextLine();
+			p.addUser(scanner.nextLine(), 0);
+			for (int i = 1; i < p.getTotalPlayer(); i++) {
+				p.addPlayer("Computer" + i, i);
+			} // User í•œ ëª…ì„ ì œì™¸í•œ ë§Œí¼ì˜ ìˆ˜ì˜ Player Computer'n'ì„ ìë™ìœ¼ë¡œ playerListì— ì¶”ê°€
+			c.setDeck(c.getRangeOfCards() * 4 + 1);   // ë± ìƒì„±
+			notify();
 		}
 	}
 
 	public void run() {
-		// ÇÃ·¹ÀÌ¾î ¼³Á¤, Ä«µå ¹üÀ§ ¼³Á¤, µ¦ »ı¼º
-		gameSetting();
-		// Á¶Ä¿ Ã£±â °ÔÀÓÀ» ÁøÇà
-		while(running) {
-			try {
-				// 1. µ¦À» ¼¯°í, Áßº¹ Ä«µå¸¦ ¹ö¸°´Ù.
-				shuffle();
-				
-				for(int i=0; i<totalPlayer; i++) {
-					playerList.get(i).dumpAll();
+		// ì¡°ì»¤ ì°¾ê¸° ê²Œì„ì„ ì§„í–‰
+		synchronized (this) {
+			while (running) {
+				// 1. ë±ì„ ì„ëŠ”ë‹¤.
+				c.shuffle();
+				// 2. ê° í”Œë ˆì´ì–´ê°€ ì¹´ë“œë¥¼ ë°›ëŠ”ë‹¤.
+				p.givenCards(c.getRangeOfCards(), c.getDeck());
+				// 2. ìì‹ ì´ ê°€ì§€ê³  ìˆëŠ” ì¤‘ë³µ ì¹´ë“œë“¤ì„ ë²„ë¦°ë‹¤.
+				for (Player each : p.playerList) each.dumpAll();
+				// 3. ì‹œì‘ í”Œë ˆì´ì–´ë¶€í„° ê²Œì„ì„ ì‹œì‘í•œë‹¤.
+				p.firstPlayer();
+				// 3. ì–´ë–¤ í”Œë ˆì´ì–´ê°€ ì¹´ë“œë¥¼ ëª¨ë‘ ë²„ë¦´ ë•Œê¹Œì§€ ê²Œì„ì„ ì§„í–‰í•œë‹¤.
+				show("* * * * * * * * * * * * * * * * * * * *");
+				show("Let's play Old maid game!!");
+				while(!winner){
+					show("- - - - - - - - - - - - - -");
+					show(p.currentPlayer.getName() + ": ");
+					p.currentPlayer.draw(p.previousPlayer);
+					p.currentPlayer.showCards();
+					isWin(p.previousPlayer, p.currentPlayer);
+					p.nextPlayer();
 				}
-				
-				// 2. ½ÃÀÛ ÇÃ·¹ÀÌ¾îºÎÅÍ °ÔÀÓÀ» ½ÃÀÛÇÑ´Ù.
-				firstPlayer();
-				// 3. ¾î¶² ÇÃ·¹ÀÌ¾î°¡ Ä«µå¸¦ ¸ğµÎ ¹ö¸± ¶§±îÁö °ÔÀÓÀ» ÁøÇàÇÑ´Ù.
-				System.out.println("* * * * * * * * * * * * * * * * * * * *");
-				System.out.println("Let's play Old maid game!!");
-				while(!winner) {
-					System.out.println("- - - - - - - - - - - - - -");
-					System.out.print(currentPlayer.getName() + ": ");
-					currentPlayer.draw(prevPlayer);
-					currentPlayer.showCards();
-					// ´©±º°¡ Ä«µå¸¦ ¸ğµÎ ¹ö·ÈÀ» °æ¿ì ½ÂÆĞ¸¦ °áÁ¤ÇÑ´Ù.
-					if (prevPlayer.cardList.size() == 0) {
-						System.out.println(prevPlayer.getName() + " is winner!!");
-						winner = true;
-						findJoker();
-					}
-					else if (currentPlayer.cardList.size() == 0) {
-						System.out.println(currentPlayer.getName() + " is winner!!");
-						winner = true;
-						findJoker();
-					}
-					nextPlayer();
-				}
-				System.out.println("* * * * * * * * * * * * * * * * * * * *");
-
-				// 4.»ç¿ëÀÚ¿¡°Ô °ÔÀÓ ÀçÁøÇà ¿©ºÎ ¹¯´Â´Ù.
+				show("* * * * * * * * * * * * * * * * * * * *");
+				// 4.ì‚¬ìš©ìì—ê²Œ ê²Œì„ ì¬ì§„í–‰ ì—¬ë¶€ ë¬»ëŠ”ë‹¤.
 				System.out.print("Would you like to exit game? (yes): ");
-				if(scanner.next().equals("yes")) end();
-				else { // ÇÃ·¹ÀÌ¾î Á¤º¸´Â ³öµÎ°í °ÔÀÓ ÃÊ±âÈ­
-					firstPlayer();
-					currentPlayer.setFirst(false); // ½ÃÀÛ ÇÃ·¹ÀÌ¾î ¾ø¾Ú
-					winner = false; 			   // ½ÂÀÚ ¾ø¾Ú
-					Iterator<Player> iter = playerList.iterator();
-					while (iter.hasNext()) { // ÇÃ·¹ÀÌ¾î°¡ °¡Áö°í ÀÖ´Â Ä«µå ¸ğµÎ ¹ö¸²
-						Player player = iter.next();
-						player.cardList.clear();
-					}
+				if (scanner.next().equals("yes")) end();
+				else { // í”Œë ˆì´ì–´ ì •ë³´ëŠ” ë†”ë‘ê³  ê²Œì„ ì´ˆê¸°í™”
+					p.resetPlayerList();
+					winner = false;
 				}
 			}
-			catch (Exception e) { // ¿¹¿Ü ¹ß»ı ½Ã end()·Î Á¤»ó Á¾·á ÇÏµµ·Ï ¿¹¿ÜÃ³¸®
-				System.out.println(e.getMessage());
-				end();
-			}
+			notify();
 		}
 	}
 
-	public static void main(String[] args) {
-		OldMaidGameApp game = new OldMaidGameApp();
-		game.run();
-	}
-}
+} //End Class OldMaidGameApreviousPlayer

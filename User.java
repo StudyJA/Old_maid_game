@@ -2,16 +2,16 @@ import java.util.Iterator;
 import java.util.Scanner;
 
 public class User extends Player {
-	User() {} // ±âº» »ı¼ºÀÚ
+	User() {} // ê¸°ë³¸ ìƒì„±ì
 	User (String name, int location) {
 		this.name = name;
 		this.location = location;
 	}
 	
-	Scanner scanner=new Scanner(System.in); // giveRandomCard()¿¡¼­ »ÌÀ» Ä«µå ¹øÈ£¸¦ »ç¿ëÀÚ·ÎºÎÅÍ ÀÔ·Â¹Ş±â À§ÇØ ½ºÄ³³Ê Ãß°¡
+	Scanner scanner=new Scanner(System.in); // giveRandomCard()ì—ì„œ ë½‘ì„ ì¹´ë“œ ë²ˆí˜¸ë¥¼ ì‚¬ìš©ìë¡œë¶€í„° ì…ë ¥ë°›ê¸° ìœ„í•´ ìŠ¤ìºë„ˆ ì¶”ê°€
 	
-	// ÀÌÀü ÇÃ·¹ÀÌ¾îÀÇ cardList¿¡¼­ User°¡ ¼±ÅÃÇÑ ¹øÈ£ÀÇ Ä«µå ÇÑ ÀåÀ» »èÁ¦ÇÏ°í ±×¸¦ ¹İÈ¯ÇÑ´Ù.
-	// User ÇÃ·¹ÀÌ¾îÀÇ Â÷·Ê¿¡ µ¿Àû¹ÙÀÎµùµÈ ¸Ş¼Òµå°¡ ½ÇÇàµÇ°Ô ÇÏ±â À§ÇØ¼­ prevPlayer¸¦ ¸Å°³º¯¼ö·Î ¹Ş´Â ÇüÅÂ·Î º¯°æÇß¾î¿ä
+	// ì´ì „ í”Œë ˆì´ì–´ì˜ cardListì—ì„œ Userê°€ ì„ íƒí•œ ë²ˆí˜¸ì˜ ì¹´ë“œ í•œ ì¥ì„ ì‚­ì œí•˜ê³  ê·¸ë¥¼ ë°˜í™˜í•œë‹¤.
+	// User í”Œë ˆì´ì–´ì˜ ì°¨ë¡€ì— ë™ì ë°”ì¸ë”©ëœ ë©”ì†Œë“œê°€ ì‹¤í–‰ë˜ê²Œ í•˜ê¸° ìœ„í•´ì„œ prevPlayerë¥¼ ë§¤ê°œë³€ìˆ˜ë¡œ ë°›ëŠ” í˜•íƒœë¡œ ë³€ê²½í–ˆì–´ìš”
 	@Override
 	Card giveRandomCard(Player prevPlayer) {
 		System.out.print("Enter a number of card to draw(1~"+prevPlayer.cardList.size()+"): ");
@@ -19,28 +19,28 @@ public class User extends Player {
 		Card card = prevPlayer.cardList.get(i);
 		prevPlayer.cardList.remove(i);
 		return card;
-	} // User Å¬·¡½º¿¡¼­´Â ÀÌ ¸Ş¼Òµå°¡ ·£´ıÇÑ Ä«µå¸¦ °í¸£Áö ¾ÊÀ¸´Ï±î ³ªÁß¿¡ ¸Ş¼Òµå ÀÌ¸§À» ¼öÁ¤ÇÏ¸é ÁÁÀ» °Í °°¾Æ¿ä!
+	} // User í´ë˜ìŠ¤ì—ì„œëŠ” ì´ ë©”ì†Œë“œê°€ ëœë¤í•œ ì¹´ë“œë¥¼ ê³ ë¥´ì§€ ì•Šìœ¼ë‹ˆê¹Œ ë‚˜ì¤‘ì— ë©”ì†Œë“œ ì´ë¦„ì„ ìˆ˜ì •í•˜ë©´ ì¢‹ì„ ê²ƒ ê°™ì•„ìš”!
 	
-	// ÀÌÀü ÇÃ·¹ÀÌ¾î¿¡°Ô Ä«µå ÇÑ ÀåÀ» ¹Ş°í °°Àº ¼ıÀÚ Ä«µå µÎ °³¸¦ ¹ö¸°´Ù.
+	// ì´ì „ í”Œë ˆì´ì–´ì—ê²Œ ì¹´ë“œ í•œ ì¥ì„ ë°›ê³  ê°™ì€ ìˆ«ì ì¹´ë“œ ë‘ ê°œë¥¼ ë²„ë¦°ë‹¤.
 	@Override
 	void draw(Player prevPlayer) {
-		Card givenCard = giveRandomCard(prevPlayer); // ÀÌÀü ÇÃ·¹ÀÌ¾îÀÇ ¹«ÀÛÀ§ Ä«µå
+		Card givenCard = giveRandomCard(prevPlayer); // ì´ì „ í”Œë ˆì´ì–´ì˜ ë¬´ì‘ìœ„ ì¹´ë“œ
 		System.out.println("You have taken " + givenCard + " from " + prevPlayer.getName());
 		//System.out.println(prevPlayer.getName()+ " to give " + givenCard +" get!");
 		System.out.print(name+": ");
-		// ÇÃ·¹ÀÌ¾îÀÇ Ä«µå¸®½ºÆ®¿¡¼­ °°Àº ¼ıÀÚ¸¦ Ã£¾Æº»´Ù.
+		// í”Œë ˆì´ì–´ì˜ ì¹´ë“œë¦¬ìŠ¤íŠ¸ì—ì„œ ê°™ì€ ìˆ«ìë¥¼ ì°¾ì•„ë³¸ë‹¤.
 		for(Card card: this.cardList)    
-			if(card.equals(givenCard)) { // °°Àº ¼ıÀÚ Ä«µå°¡ ÀÖÀ» ¶§
+			if(card.equals(givenCard)) { // ê°™ì€ ìˆ«ì ì¹´ë“œê°€ ìˆì„ ë•Œ
 				System.out.println( "Dump " + card + " and " + givenCard + " from hand");
 				this.cardList.remove(card);
 				return;
 			}
-		// °°Àº ¼ıÀÚ Ä«µå°¡ ¾øÀ» ¶§
+		// ê°™ì€ ìˆ«ì ì¹´ë“œê°€ ì—†ì„ ë•Œ
 		System.out.println("There are no pair with same number");
 		cardList.add(givenCard);	
 	}
 	
-	// cardListÀÇ Ä«µå¸¦ ¸ğµÎ º¸¿©ÁØ´Ù.
+	// cardListì˜ ì¹´ë“œë¥¼ ëª¨ë‘ ë³´ì—¬ì¤€ë‹¤.
 	@Override
 	public void showCards() {
 		if (cardList != null) {
