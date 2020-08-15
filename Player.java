@@ -1,14 +1,14 @@
 import java.util.*;
 
 public class Player {
-	// User Å¬·¡½º¿¡¼­ »ç¿ëÇÏ±â À§ÇØ name°ú locationÀ» protected·Î º¯°æ
-	protected String name;  // ÀÌ¸§
-	protected int location; // °ÔÀÓ º¸µå¿¡¼­ À§Ä¡
-	private boolean first = false; // ½ÃÀÛ ÇÃ·¹ÀÌ¾îÀÎÁö È®ÀÎ
-	private int score = 0;  // Á¡¼ö
-	List<Card> cardList; 	// ÇÃ·¹ÀÌ¾î°¡ °¡Áö°í ÀÖ´Â Ä«µåµé
+	// User í´ë˜ìŠ¤ì—ì„œ ì‚¬ìš©í•˜ê¸° ìœ„í•´ nameê³¼ locationì„ protectedë¡œ ë³€ê²½
+	protected String name;  // ì´ë¦„
+	protected int location; // ê²Œì„ ë³´ë“œì—ì„œ ìœ„ì¹˜
+	private boolean first = false; // ì‹œì‘ í”Œë ˆì´ì–´ì¸ì§€ í™•ì¸
+	private int score = 0;  // ì ìˆ˜
+	Vector<Card> cardList; 	// í”Œë ˆì´ì–´ê°€ ê°€ì§€ê³  ìˆëŠ” ì¹´ë“œë“¤
 
-	Player() {} // ±âº» »ı¼ºÀÚ Ãß°¡
+	Player() {} // ê¸°ë³¸ ìƒì„±ì ì¶”ê°€
 	Player (String name, int location) {
 		this.name = name;
 		this.location = location;
@@ -17,10 +17,11 @@ public class Player {
 	public int getLocation() { return location; }
 	public void setFirst(boolean first) { this.first = first; }
 	public boolean isFirst() { return this.first; }
-	public void setCardList(List<Card> cardList) { this.cardList = cardList; }
-	public void plusScore() { this.score++; } // Á¡¼ö¸¦ 1Á¡ ¿Ã¸°´Ù.
+	public void setCardList(Vector<Card> cardList) { this.cardList = cardList; }
+	public void plusScore() { this.score++; } 	// Winner gets 1 point
+	public void minusScore() { this.score++; }  // Joker gets -1 point
 
-	// ÀÌÀü ÇÃ·¹ÀÌ¾îÀÇ cardList¿¡¼­ ·£´ıÇÑ Ä«µå ÇÑ ÀåÀ» »èÁ¦ÇÏ°í ±×¸¦ ¹İÈ¯ÇÑ´Ù.
+	// ì´ì „ í”Œë ˆì´ì–´ì˜ cardListì—ì„œ ëœë¤í•œ ì¹´ë“œ í•œ ì¥ì„ ì‚­ì œí•˜ê³  ê·¸ë¥¼ ë°˜í™˜í•œë‹¤.
 	Card giveRandomCard(Player prevPlayer) {
 		Card card = null;
 		int index = 0;
@@ -35,51 +36,62 @@ public class Player {
 		return card;
 	}
 
-	// ÀÌÀü ÇÃ·¹ÀÌ¾î¿¡°Ô Ä«µå ÇÑ ÀåÀ» ¹Ş°í °°Àº ¼ıÀÚ Ä«µå µÎ °³¸¦ ¹ö¸®¸ç, ÀÌ °úÁ¤ÀÌ Ãâ·ÂµÇÁö ¾Êµµ·Ï ÇÑ´Ù.
+	// ì´ì „ í”Œë ˆì´ì–´ì—ê²Œ ì¹´ë“œ í•œ ì¥ì„ ë°›ê³  ê°™ì€ ìˆ«ì ì¹´ë“œ ë‘ ê°œë¥¼ ë²„ë¦¬ë©°, ì´ ê³¼ì •ì´ ì¶œë ¥ë˜ì§€ ì•Šë„ë¡ í•œë‹¤.
 	void draw(Player prevPlayer) {
-		Card givenCard = giveRandomCard(prevPlayer); // ÀÌÀü ÇÃ·¹ÀÌ¾îÀÇ ¹«ÀÛÀ§ Ä«µå
+		Card givenCard = giveRandomCard(prevPlayer); // ì´ì „ í”Œë ˆì´ì–´ì˜ ë¬´ì‘ìœ„ ì¹´ë“œ
 		System.out.println("took a card from "+prevPlayer.getName());
-		// ÇÃ·¹ÀÌ¾îÀÇ Ä«µå¸®½ºÆ®¿¡¼­ °°Àº ¼ıÀÚ¸¦ Ã£¾Æº»´Ù.
-		for(Card card: this.cardList)    
-			if(card.equals(givenCard)) { // °°Àº ¼ıÀÚ Ä«µå°¡ ÀÖÀ» ¶§
+		// í”Œë ˆì´ì–´ì˜ ì¹´ë“œë¦¬ìŠ¤íŠ¸ì—ì„œ ê°™ì€ ìˆ«ìë¥¼ ì°¾ì•„ë³¸ë‹¤.
+		for(Card card: this.cardList)
+			if(card.equals(givenCard)) { // ê°™ì€ ìˆ«ì ì¹´ë“œê°€ ìˆì„ ë•Œ
 				System.out.println("Dump " + card + " and " + givenCard + " from hand");
 				this.cardList.remove(card);
 				return;
 			}
-		// °°Àº ¼ıÀÚ Ä«µå°¡ ¾øÀ» ¶§
-		cardList.add(givenCard);	
+		// ê°™ì€ ìˆ«ì ì¹´ë“œê°€ ì—†ì„ ë•Œ
+		cardList.add(givenCard);
 	}
-	
-	// cardListÀÇ Ä«µå°¡ ¸î ÀåÀÎÁö Ãâ·ÂÇÑ´Ù.
+
+	// cardListì˜ ì¹´ë“œê°€ ëª‡ ì¥ì¸ì§€ ì¶œë ¥í•œë‹¤.
 	public void showCards() {
 		System.out.print(name + ": has " + cardList.size() + " cards");
 		System.out.println();
 	}
-	
-	// ÀÚ½ÅÀÌ °¡Áø Ä«µå Áß Áßº¹ ¼ıÀÚ Ä«µå¸¦ ¸ğµÎ ¹ö¸°´Ù.
+
+	// Dump same number pair
 	public void dumpAll() {
-		boolean checkedAll=false;
-		int j=0;
-		while(!checkedAll) {
-			if(j>=cardList.size()-1) {
-				checkedAll=true;
-				continue;
-			}
-			else {
-				Card card1 = cardList.get(j);
-				for(int i=j+1; i < cardList.size(); i++) {
-					Card card2 = cardList.get(i);
-					if(card1.equals(card2)) { // °°Àº ¼ıÀÚ Ä«µå°¡ ÀÖÀ» ¶§
-						System.out.print(getName()+": ");
-						System.out.println("Dump " + card1 + " and " + card2 + " from hand");
-						//card1, card2¸¦ cardList¿¡¼­ »èÁ¦
-						this.cardList.remove(j);
-						this.cardList.remove(i);
-						break;
-					}
-					j++;
-				}
+		final int size = cardList.size();
+		int cardNumberList[][] = new int[size][2];
+		boolean toDelete[] = new boolean[size];
+		for(int i=0; i<size; i++) {
+			cardNumberList[i][0] = cardList.get(i).getNumber();
+			cardNumberList[i][1] = i; // cardList's index
+			toDelete[i] = false;
+		}
+		Arrays.sort(cardNumberList, Comparator.comparingDouble(o -> o[0]));
+
+		// When same number pair appeared sequentially
+		// in sorted list of card number
+		// <toDelete> matching both card's index are set true
+		System.out.print(name + ": Dump cards  ");
+		int prev, previousIndex, current, currentIndex;
+		for(int i=1; i<size; i++) {
+
+			prev = cardNumberList[i-1][0];
+			previousIndex = cardNumberList[i-1][1];
+			current = cardNumberList[i][0];
+			currentIndex = cardNumberList[i][1];
+
+			if(prev == current) {
+				System.out.print(cardList.get(previousIndex) + "&" + cardList.get(currentIndex) + " ");
+				toDelete[previousIndex] = true;
+				toDelete[currentIndex] = true;
+				i++; // Skip a next card
 			}
 		}
+		System.out.println();
+
+		// By reverse order. Remove that toDelete is true
+		for(int j=size-1; j>=0; j--)
+			if(toDelete[j]) cardList.remove(j);
 	}
 }
