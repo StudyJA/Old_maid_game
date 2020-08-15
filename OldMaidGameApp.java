@@ -51,8 +51,7 @@ public class OldMaidGameApp extends Thread {
 
 			show("Please type your name");
 			System.out.print("Player's name: ");
-			scanner.nextLine();
-			p.addUser(scanner.nextLine(), 0);
+			p.addUser("test", 0);
 			for (int i = 1; i < p.getTotalPlayer(); i++) {
 				p.addPlayer("Computer" + i, i);
 			} // User 한 명을 제외한 만큼의 수의 Player Computer'n'을 자동으로 playerList에 추가

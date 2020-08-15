@@ -19,7 +19,7 @@ public class Player {
 	public boolean isFirst() { return this.first; }
 	public void setCardList(Vector<Card> cardList) { this.cardList = cardList; }
 	public void plusScore() { this.score++; } 	// Winner gets 1 point
-	public void minusScore() { this.score--; }  // Joker gets -1 point
+	public void minusScore() { this.score++; }  // Joker gets -1 point
 
 	// 이전 플레이어의 cardList에서 랜덤한 카드 한 장을 삭제하고 그를 반환한다.
 	Card giveRandomCard(Player prevPlayer) {
