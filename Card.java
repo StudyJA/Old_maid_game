@@ -17,7 +17,7 @@ public class Card {
 			return true;
 		else
 			return false;
-	} // If both this object's number and another objects's are same, then return true
+	} // 두 카드의 숫자가 같으면 참
 	@Override
 	public String toString() {
 		return this.shape + this.number;
