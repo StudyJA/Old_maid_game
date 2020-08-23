@@ -12,13 +12,13 @@ class ControlCard {
 	int getRangeOfCards() { return rangeOfCards; }
 
 	void setDeck(int sizeOfDeck) {
-		String[] shapes = {"◆", "♥", "♠", "♣"};
+		String[] shapes = {"dia", "heart", "spade", "clover"};
 		this.deck = new Vector<Card>(sizeOfDeck);
 		for(String shape : shapes)
 			for(int i=1; i <= rangeOfCards; i++) {
 				this.deck.add(new Card(shape, i));
 			}
-		this.deck.add(new Card("J", 0));
+		this.deck.add(new Card("joker", 0));
 	}
 
 	Vector<Card> getDeck() { return deck; }

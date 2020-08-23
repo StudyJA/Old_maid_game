@@ -68,7 +68,7 @@ class ControlPlayer {
 	}
 
 	// Distribute the deck to players and set a first player
-	void givenCards(int rangeOfCards, Vector<Card> deck) {
+	void shareCards(int rangeOfCards, Vector<Card> deck) {
 		int randNum = (int)(Math.random()*totalPlayer);
 		currentPlayer = playerList.get(randNum);
 		currentPlayer.setFirst(true); // 카드를 첫번째로 받는 플레이어를 시작 플레이어로 설정
