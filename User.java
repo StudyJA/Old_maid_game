@@ -2,33 +2,35 @@ import java.util.Iterator;
 import java.util.Scanner;
 
 public class User extends Player {
-	User() {} // 기본 생성자
-	User (String name, int location) {
-		this.name = name;
-		this.location = location;
-	}
-	
-	Scanner scanner=new Scanner(System.in); // giveRandomCard()에서 뽑을 카드 번호를 사용자로부터 입력받기 위해 스캐너 추가
-	
-	// 이전 플레이어의 cardList에서 User가 선택한 번호의 카드 한 장을 삭제하고 그를 반환한다.
-	// User 플레이어의 차례에 동적바인딩된 메소드가 실행되게 하기 위해서 prevPlayer를 매개변수로 받는 형태로 변경했어요
-	@Override
-	Card giveRandomCard(Player prevPlayer) {
+	Scanner scanner = new Scanner(System.in); // giveRandomCard()에서 뽑을 카드 번호를 사용자가 입력하기 위한 스캐너
+	public UserPanel panel;
+	// 부모 생성자 호출
+	User (String name, int location) { super(name, location); }
+
+	// giveRandomCard를 굳이 오버라이딩할 필요없이 User만의 메소드 selectCard로 이름 변경
+	Card selectCard(Player prevPlayer) {
 		System.out.print("Enter a number of card to draw(1~"+prevPlayer.cardList.size()+"): ");
 		int i = scanner.nextInt()-1;
-		Card card = prevPlayer.cardList.get(i);
-		prevPlayer.cardList.remove(i);
+		prevPlayer.panel.minusBack(1); // 이전 플레이어 패널에서 카드 한장 제거
+		return prevPlayer.cardList.remove(i); // remove는 삭제한 원소를 반환
+	}
+
+	@Override
+	Card giveRandomCard() { //유저의 카드를 뽑아가면 그 카드가 보이게끔 giveRandomCard 오버라이딩
+		int i = (int)(Math.random()*this.cardList.size());
+		Card card = this.cardList.remove(i);
+		System.out.println("took " + card + " from " + this.getName());
 		return card;
-	} // User 클래스에서는 이 메소드가 랜덤한 카드를 고르지 않으니까 나중에 메소드 이름을 수정하면 좋을 것 같아요!
-	
-	// 이전 플레이어에게 카드 한 장을 받고 같은 숫자 카드 두 개를 버린다.
+	}
+
+	// 유저가 선택한 카드 한 장과 같은 숫자의 카드를 찾아 버림. 중간에 뽑은 카드도 보여줌
 	@Override
 	void draw(Player prevPlayer) {
-		Card givenCard = giveRandomCard(prevPlayer); // 이전 플레이어의 무작위 카드
+		Card givenCard = selectCard(prevPlayer);  // 이전 플레이어의 카드를 뽑는다.
 		System.out.println("You have taken " + givenCard + " from " + prevPlayer.getName());
-		//System.out.println(prevPlayer.getName()+ " to give " + givenCard +" get!");
+		//System.out.println(prevPlayer.getName()+ " to give " + givenCard +" get!"); ***다인님 이 코드가 뭔지 설명 해주세요***
 		System.out.print(name+": ");
-		// 플레이어의 카드리스트에서 같은 숫자를 찾아본다.
+		// 유저의 카드 중에서 같은 숫자를 탐색
 		for(Card card: this.cardList)    
 			if(card.equals(givenCard)) { // 같은 숫자 카드가 있을 때
 				System.out.println( "Dump " + card + " and " + givenCard + " from hand");
@@ -37,10 +39,11 @@ public class User extends Player {
 			}
 		// 같은 숫자 카드가 없을 때
 		System.out.println("There are no pair with same number");
-		cardList.add(givenCard);	
+		cardList.add(givenCard); // 카드 패에 카드 추가
+		panel.refresh();
 	}
 	
-	// cardList의 카드를 모두 보여준다.
+	// User가 가지고 있는 카드들을 모두 출력
 	@Override
 	public void showCards() {
 		if (cardList != null) {
