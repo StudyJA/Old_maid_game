@@ -9,7 +9,7 @@ public class PlayerPanel extends JPanel {
     int cardListSize;
     PlayerPanel(int cardListSize) {
         this.cardListSize = cardListSize;
-        setBackground(Color.white);
+        //setBackground(Color.white);
         setLayout(new FlowLayout());
         for(int i=0; i<cardListSize; i++) {
             JLabel j = new JLabel(back);

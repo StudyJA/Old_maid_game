@@ -1,6 +1,7 @@
 import java.util.*;
 
 public class Player {
+	public String lineToPrint; // gui 창에 출력할 값을 저장하는 변수
 	protected String name;  // 이름
 	protected int location; // 게임 보드에서 위치
 	private boolean first = false; // 시작 플레이어인지 확인
@@ -19,17 +20,20 @@ public class Player {
 	public void setCardList(Vector<Card> cardList) { this.cardList = cardList; }
 	public void plusScore() { this.score++; } 	// Winner gets 1 point
 	public void minusScore() { this.score--; }  // Joker gets -1 point
+	void print(String s) { lineToPrint = s; } // lineToPrint에 값을 저장
+	void addprint(String s) { lineToPrint += s;} // 기존 lineToPrint에 값을 이어붙여 저장
+	void nextprint(String s) { lineToPrint += ",  " + s; } // 기존 lineToPrint의 다음 줄에 값을 이어붙여 저장
 
 	// 자신의 cardList에서 무작위 카드 한 장을 뽑음
 	Card giveRandomCard() {
 		int i = (int)(Math.random()*this.cardList.size());
-		System.out.println("took a card from " + this.getName());
 		return this.cardList.remove(i);
 	}
 
 	// 이전 플레이어의 무작위 카드 한 장과 같은 숫자의 카드를 찾아 버림. 플레이어는 카드 출력 안함
-	void draw(Player prevPlayer) {
+	void draw(Player prevPlayer) throws InterruptedException {
 		Card givenCard = prevPlayer.giveRandomCard(); // 이전 플레이어의 무작위 카드
+		print("took a card from " + prevPlayer.getName());
 		if(prevPlayer.getLocation() == 0) { // 이전 플레이어가 유저라면
 			User user = (User)prevPlayer;
 			user.panel.refresh(); // 유저의 패널을 갱신
@@ -37,11 +41,11 @@ public class Player {
 		else {
 			prevPlayer.panel.minusBack(1); // 이전 플레이어 패널에서 카드 한장 제거
 		}
-
+		Thread.sleep(3000);
 		// 플레이어의 카드들에서 같은 숫자를 탐색
 		for(Card card: this.cardList) {
 			if (card.equals(givenCard)) { // 같은 숫자 카드가 있을 때
-				System.out.println("Dump " + card + " and " + givenCard + " from hand");
+				nextprint("Dump " + card + " and " + givenCard + " from hand");
 				panel.minusBack(1); // 패널에서 카드 한 장 제거
 				this.cardList.remove(card);
 				return;
@@ -54,8 +58,8 @@ public class Player {
 
 	// 플레이어의 카드가 몇 장인지 출력
 	public void showCards() {
-		System.out.print(name + ": has " + cardList.size() + " cards");
-		System.out.println();
+		print(name + " has " + cardList.size() + " cards");
+		//System.out.println();
 	}
 
 	// 게임 시작 전 중복 카드를 모두 제거
@@ -72,7 +76,7 @@ public class Player {
 		Arrays.sort(cardNumberList, Comparator.comparingDouble(o -> o[0]));
 
 		// 같은 숫자가 연속으로 두번 나오면 중복이므로 toDelete에 둘다 표시
-		System.out.print(name + ": Dump cards  ");
+		print(name + ": Dump cards  ");
 		int prev, previousIndex, current, currentIndex;
 		for(int i=1; i<size; i++) { // 지금 카드와 이전 카드를 함께 보며 중복인지 확인
 
@@ -82,16 +86,17 @@ public class Player {
 			currentIndex = cardNumberList[i][1];
 
 			if(prev == current) {
-				System.out.print(cardList.get(previousIndex) + "&" + cardList.get(currentIndex) + " ");
+				addprint(cardList.get(previousIndex) + " & " + cardList.get(currentIndex) + "  ");
 				toDelete[previousIndex] = true;
 				toDelete[currentIndex] = true;
 				i++; // 앞서 두개의 카드가 중복이면 다음 카드를 스킵하고 다다음 카드를 봄
 			}
 		}
-		System.out.println();
+		//System.out.println();
 
 		// 뒤에서 부터 toDelete가 참인 카드를 제거
-		for(int j=size-1; j>=0; j--)
+		for(int j=size-1; j>=0; j--) {
 			if(toDelete[j]) cardList.remove(j);
+		}
 	}
 }

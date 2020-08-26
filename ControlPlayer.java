@@ -58,7 +58,7 @@ class ControlPlayer {
 		}
 	}
 
-	// Find player who has joker
+	// 조커를 가진 플레이어를 찾아낸다.
 	Player findJoker() {
 		for(int i=0; i < totalPlayer; i++) {
 			for (Card card : playerList.get(i).cardList)
@@ -67,7 +67,7 @@ class ControlPlayer {
 		return null;
 	}
 
-	// Distribute the deck to players and set a first player
+	// 플레이어들에게 카드를 분배하고 시작 플레이어를 설정한다.
 	void shareCards(int rangeOfCards, Vector<Card> deck) {
 		int randNum = (int)(Math.random()*totalPlayer);
 		currentPlayer = playerList.get(randNum);

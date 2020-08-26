@@ -2,11 +2,11 @@ import java.util.Iterator;
 import java.util.Scanner;
 
 public class User extends Player {
-	Scanner scanner = new Scanner(System.in); // giveRandomCard()에서 뽑을 카드 번호를 사용자가 입력하기 위한 스캐너
+	Scanner scanner = new Scanner(System.in); // 뽑을 카드 번호를 사용자가 입력하기 위한 스캐너
 	public UserPanel panel;
 	// 부모 생성자 호출
 	User (String name, int location) { super(name, location); }
-
+	
 	// giveRandomCard를 굳이 오버라이딩할 필요없이 User만의 메소드 selectCard로 이름 변경
 	Card selectCard(Player prevPlayer) {
 		System.out.print("Enter a number of card to draw(1~"+prevPlayer.cardList.size()+"): ");
@@ -19,7 +19,7 @@ public class User extends Player {
 	Card giveRandomCard() { //유저의 카드를 뽑아가면 그 카드가 보이게끔 giveRandomCard 오버라이딩
 		int i = (int)(Math.random()*this.cardList.size());
 		Card card = this.cardList.remove(i);
-		System.out.println("took " + card + " from " + this.getName());
+		print("took " + card + " from " + this.getName());
 		return card;
 	}
 
@@ -27,18 +27,19 @@ public class User extends Player {
 	@Override
 	void draw(Player prevPlayer) {
 		Card givenCard = selectCard(prevPlayer);  // 이전 플레이어의 카드를 뽑는다.
-		System.out.println("You have taken " + givenCard + " from " + prevPlayer.getName());
+		print("You have taken " + givenCard + " from " + prevPlayer.getName());
 		//System.out.println(prevPlayer.getName()+ " to give " + givenCard +" get!"); ***다인님 이 코드가 뭔지 설명 해주세요***
-		System.out.print(name+": ");
+		// ***이 주석처리된 기존 코드에서 문장만 수정한 코드입니다
+		
 		// 유저의 카드 중에서 같은 숫자를 탐색
 		for(Card card: this.cardList)    
 			if(card.equals(givenCard)) { // 같은 숫자 카드가 있을 때
-				System.out.println( "Dump " + card + " and " + givenCard + " from hand");
+				nextprint( "Dump " + card + " and " + givenCard + " from hand");
 				this.cardList.remove(card);
 				return;
 			}
 		// 같은 숫자 카드가 없을 때
-		System.out.println("There are no pair with same number");
+		nextprint("There are no pair with same number");
 		cardList.add(givenCard); // 카드 패에 카드 추가
 		panel.refresh();
 	}
