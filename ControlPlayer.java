@@ -1,17 +1,16 @@
 import java.util.*;
 
 /**
- *  플레이어 정보를 설정하고 플레이어 목록을 만들어 조작한다.
+ *  플레이어 정보를 설정하고 플레이어 목록을 만들어 조작
+ *  플레이어에게 카드를 나눠주는 shareCards(...)
+ *  다음 플레이어로 넘어가는 nextPlayer()
  *  주요 변수: totalPlayer, playerList, currentPlayer
  */
 class ControlPlayer {
-	private int totalPlayer  = 2;  // 전체 플레이어 수 나중에 조절가능
+	int totalPlayer  = 2;  // 전체 플레이어 수 나중에 조절가능
 	Player previousPlayer; // 바로 전 턴을 진행한 플레이어
 	Player currentPlayer;  // 현재 턴을 진행 중인 플레이어
 	ArrayList<Player> playerList = new ArrayList<>(totalPlayer);
-
-	void setTotalPlayer(int totalPlayer) { this.totalPlayer = totalPlayer; }
-	int getTotalPlayer() { return totalPlayer; }
 
 	// 다음 플레이어를 currentPlayer로 현재 플레이어를 이전 플레이어로 설정
 	void nextPlayer() {
@@ -20,7 +19,7 @@ class ControlPlayer {
 			if(currentPlayer == playerList.get(totalPlayer-1)) // 마지막 플레이어
 				currentPlayer = playerList.get(0);
 			else
-				currentPlayer = playerList.get(currentPlayer.getLocation() + 1);
+				currentPlayer = playerList.get(currentPlayer.location + 1);
 		}
 	}
 
@@ -29,7 +28,7 @@ class ControlPlayer {
 	void firstPlayer() {
 		for(int i = 0; i<totalPlayer; i++) {
 			currentPlayer = playerList.get(i);
-			if(currentPlayer.isFirst()){
+			if(currentPlayer.first){
 				if(i == 0)
 					previousPlayer = playerList.get(totalPlayer-1);
 				else
@@ -43,37 +42,38 @@ class ControlPlayer {
 	void addPlayer(String name, int location) {
 		playerList.add(new Player(name, location));
 	}
-	// addPlayer와 같은 역할로, User 플레이어 생성
+	// addPlayer와 같은 역할로, 유저 생성
 	void addUser(String name, int location) {
 		playerList.add(new User(name, location));
 	}
 
 	void resetPlayerList() {
-		firstPlayer();
-		currentPlayer.setFirst(false); // 시작 플레이어 없앰
-		Iterator<Player> iter = playerList.iterator();
-		while (iter.hasNext()) { // 플레이어가 가지고 있는 카드 모두 버림
-			Player player = iter.next();
-			player.cardList.clear();
+		OldMaidGameApp.winner = false;
+		for(Player each: playerList) {
+			each.first = false; 	// 시작 플레이어 삭제
+			each.cardList.clear();  // 카드 리스트 청소
+			each.panel.refresh();	// 패널 청소
 		}
 	}
 
-	// Find player who has joker
-	Player findJoker() {
-		for(int i=0; i < totalPlayer; i++) {
-			for (Card card : playerList.get(i).cardList)
-				if (card.getNumber() == 0) return playerList.get(i);
-		}
-		return null;
+	// 조커를 가진 플레이어를 찾고 감점
+	void findJoker() {
+		for(Player each : playerList)
+			for(Card card : each.cardList) {
+				if (card.number == 0) {
+					System.out.println(each.name + "has the joker");
+					each.score--;
+				}
+			}
 	}
 
-	// Distribute the deck to players and set a first player
+	// 각 플레이어에게 카드를 나눠주고 시작 플레이어 설정
 	void shareCards(int rangeOfCards, Vector<Card> deck) {
 		int randNum = (int)(Math.random()*totalPlayer);
 		currentPlayer = playerList.get(randNum);
-		currentPlayer.setFirst(true); // 카드를 첫번째로 받는 플레이어를 시작 플레이어로 설정
+		currentPlayer.first = true; // 첫번째로 카드를 받으면 시작 플레이어
 		int totalCards = rangeOfCards*4 + 1; // 전체 카드 수
-		int shareCards = (int)(totalCards/totalPlayer);
+		int shareCards = totalCards/totalPlayer;
 		int startIndex = 0;
 		int endIndex   = shareCards;
 

@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.*;
 
 /**
@@ -9,135 +11,117 @@ import java.util.*;
 public class OldMaidGameApp extends JFrame {
 
 	Scanner scanner  = new Scanner(System.in);
-	boolean running  = true;  // 전체 게임의 진행중 여부를 나타내는 변수.
-	boolean winner   = false; // 승자가 나오면 상태가 true로 바뀌도록 하기
+	static boolean winner   = false; // 승자가 나오면 상태가 true로 바뀌도록 하기
 	ControlPlayer p  = new ControlPlayer();
 	ControlCard   c  = new ControlCard();
 
-	// 누군가 카드를 모두 버렸을 경우 승자와 패자 결정 및 점수 계산
-	void isWin(Player previousPlayer, Player currentPlayer) {
-		Player loser = p.findJoker();
-		if (previousPlayer.cardList.size() == 0) {
-			for(Player each: p.playerList) // 유저가 아니면 카드를 모두 보여줌
-				if (each.getLocation() != 0)  flipCards(each);
-			winner = true;
-			show(previousPlayer.getName() + " is winner!!");
-			previousPlayer.plusScore();
-			show(loser.getName() + " has Joker!");
-			loser.minusScore();
-		}
-		else if (currentPlayer.cardList.size() == 0) {
-			for(Player each: p.playerList) // 유저가 아니면 카드를 모두 보여줌
-				if (each.getLocation() != 0)  flipCards(each);
-			winner = true;
-			show(currentPlayer.getName() + " is winner!!");
-			currentPlayer.plusScore();
-			show(loser.getName() + " has Joker!");
-			loser.minusScore();
-		}
-	}
 
-	// 유저가 아닌 나머지 플레이어의 카드를 모두 공개
-	public void flipCards(Player player) {
-		player.panel.removeAll();
-		for(Card card: player.cardList){
-			String filename = "img/" + card + ".jpg";
-			ImageIcon icon = new ImageIcon(filename);
-			JLabel j = new JLabel(icon);
-			j.setOpaque(true);
-			j.setSize(icon.getIconWidth(),icon.getIconHeight());
-			player.panel.add(j);
-		}
-		player.panel.revalidate();
-		player.panel.repaint();
-	}
-
-	// 게임 종료
-	void end() { running = false; }
-
-	// 콘솔 출력
-	void show(String msg) {
-		System.out.println(msg);
-	}
 
 	// 플레이어 설정, 카드 범위 설정, 덱 생성
 	void gameSetting() {
-		show("Game setting...");
-
+		System.out.println("Game setting...");
 		System.out.print("How many players with you?: ");
-		p.setTotalPlayer(scanner.nextInt());
+		p.totalPlayer = scanner.nextInt();
+		System.out.print("Range of Cards(1~13): ");
+		c.rangeOfCards = scanner.nextInt();
+		BoardPanel.showRight( "Number of players: " + p.totalPlayer + ", Range of cards: 1~" + c.rangeOfCards);
 
-		System.out.print("Range of Cards(1~?): ");
-		c.setRangeOfCards(scanner.nextInt());
-
-		show("Please type your name");
-		System.out.print("Player's name: ");
-		scanner.nextLine();
-		p.addUser(scanner.nextLine(), 0);
-		for (int i = 1; i < p.getTotalPlayer(); i++) {
+		for (int i = 0; i < p.totalPlayer -1; i++) {
 			p.addPlayer("Computer" + i, i);
 		} // User 한 명을 제외한 만큼의 수의 Player Computer'n'을 자동으로 playerList에 추가
-		c.setDeck(c.getRangeOfCards() * 4 + 1);   // 덱 생성
-	}
 
-	public void run() { // 조커 찾기 게임을 텍스트로 진행 (테스트용)
-		while (running) {
-			show("* * * * * * * * * * * * * * * * * * * *");
-			show("Let's play Old maid game!!");
-			while(!winner){
-				show("- - - - - - - - - - - - - -");
-				show(p.currentPlayer.getName() + ": ");
-				p.currentPlayer.draw(p.previousPlayer);
-				p.currentPlayer.showCards();
-				isWin(p.previousPlayer, p.currentPlayer);
-				p.nextPlayer();
-			}
-			show("* * * * * * * * * * * * * * * * * * * *");
-			// 4.사용자에게 게임 재진행 여부 묻는다.
-			System.out.print("Would you like to exit game? (yes): ");
-			if (scanner.next().equals("yes")) end();
-			else { // 플레이어 정보는 놔두고 게임 초기화
-				p.resetPlayerList();
-				winner = false;
-			}
-		}
+		System.out.print("Please type your name: ");
+		scanner.nextLine();
+		p.addUser(scanner.nextLine(), p.totalPlayer-1); // 유저 패널은 맨 밑에 위치
+		c.setDeck(c.rangeOfCards * 4 + 1);   // 덱 생성
 	}
 
 	/**
 	 * GUI
 	 */
 	OldMaidGameApp() {
+		super("Old maid game");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setLayout(new GridLayout(4,1));
-		int width = 1800, height = 900;
-
-		gameSetting(); // 터미널에서 게임 세팅
+		gameSetting(); // 콘솔에서 게임 세팅
+		setLayout(new GridLayout(p.totalPlayer+1,1)); // 전체 플레이어 수로 세로크기 결정
+		setBackground(Color.white);
+		BoardPanel boardPanel = new BoardPanel(); // GUI
+		this.add(boardPanel);
 		// 1. 덱을 섞는다.
 		c.shuffle();
 		// 2. 플레이어들에게 카드를 나눠준다.
-		p.shareCards(c.getRangeOfCards(), c.getDeck());
+		p.shareCards(c.rangeOfCards, c.getDeck());
 		// 3. 중복 카드를 버리고 패널을 집어 넣는다.
+		int maxSize = 0; // 윈도창 가로 너비 설정을 위한 최대 카드 소지 개수
 		for (Player each : p.playerList) {
 			each.dumpAll();
-			if(each.getLocation() == 0) {
-				User user = (User)each;
-				user.panel = new UserPanel(user);
-				this.add(user.panel);
-			}
-			else {
-				each.panel = new PlayerPanel(each.cardList.size());
-				this.add(each.panel);
-			}
+			each.panel = new GamePanel(each);
+			if(!each.user)
+				each.panel.cover();
+			else
+				each.panel.uncover(); // 유저 패널만 카드 앞면 보여주기
+			this.add(each.panel);
+			if(maxSize < each.cardList.size())
+				maxSize = each.cardList.size();
 		}
-		// 4. 시작 플레이어부터 게임을 시작한다.
+		// 4. 시작 플레이어 설정
 		p.firstPlayer();
 
-		setSize(width, height);
+		setSize(72*(maxSize+4), 101*(p.totalPlayer+2));
 		setVisible(true);
 	}
 
-	public static void main(String[] args) {
-		OldMaidGameApp game = new OldMaidGameApp();
-		game.run();
+}
+
+class Main implements Runnable {
+	static OldMaidGameApp game;
+	static Scanner scanner = new Scanner(System.in);
+	public void run() { // 게임의 승자가 나오면 게임을 중지 하고 점수 계산 후 다시 시작할 지 정함
+		System.out.println("* * * * * * * * * * * * * * * * * * * *");
+		System.out.println("Let's play Old maid game!!");
+		try{
+			while (!game.winner) {
+				System.out.println("- - - - - - - - - - - - - -");
+				BoardPanel.showLeft(game.p.currentPlayer.name + "'s turn ");
+				game.p.currentPlayer.draw(game.p.previousPlayer);
+				game.p.currentPlayer.showCards();
+				game.p.nextPlayer();
+				Thread.sleep(3000);
+			}
+			for(Player player: game.p.playerList) player.panel.uncover(); // 카드 전부 공개
+			game.p.findJoker(); // 조커 찾기
+			System.out.println("* * * * * * * * * * * * * * * * * * * *");
+			System.out.print("Would you like to exit game? (yes):");
+			if("yes".equals(scanner.next())) {
+				// 1. 덱, 플레이어 초기화
+				game.p.resetPlayerList();
+				game.c.resetDeck();
+				// 2. 덱을 섞고 카드 분배
+				game.c.shuffle();
+				game.p.shareCards(game.c.rangeOfCards, game.c.getDeck());
+				// 3. 중복카드 제거
+				for (Player each : game.p.playerList) {
+					each.dumpAll();
+					if(!each.user)
+						each.panel.cover();
+					else
+						each.panel.uncover(); // 유저 패널만 uncover
+					each.panel.revalidate();
+					each.panel.repaint();
+				}
+				Thread tmpThread = new Thread(new Main());
+				tmpThread.start();
+			}
+
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
+
+	public static void main(String[] args) {
+		game = new OldMaidGameApp();
+		Thread tmpThread = new Thread(new Main());
+		tmpThread.start();
+	}
+
 }
