@@ -48,7 +48,6 @@ class ControlPlayer {
 	}
 
 	void resetPlayerList() {
-		OldMaidGameApp.winner = false;
 		for(Player each: playerList) {
 			each.first = false; 	// 시작 플레이어 삭제
 			each.cardList.clear();  // 카드 리스트 청소

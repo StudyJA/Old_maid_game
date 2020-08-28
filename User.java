@@ -20,6 +20,7 @@ public class User extends Player {
 	// 유저가 이전 플레이어의 카드를 선택해서 뽑음
 	@Override
 	void draw(Player prevPlayer) {
+			previousPlayer = prevPlayer;
 			prevPlayer.panel.setBackground(Color.white);
 			panel.setBackground(Color.GRAY);
 			BoardPanel.showRight("Please select " + prevPlayer.name + "'s card\n");
@@ -38,7 +39,7 @@ public class User extends Player {
 			card.setForth();
 			card.removeMouseListener(this);
 			card.clickable = false;
-			dump(card);
+			cardList.add(card);
 			panel.refresh();
 		}
 	}
