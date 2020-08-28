@@ -1,5 +1,4 @@
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 
 public class Card extends JLabel {
@@ -27,6 +26,22 @@ public class Card extends JLabel {
 	}
 	@Override
 	public String toString() {
-		return shape + number;
+		String numberToPrint;
+		String shapeToPrint;
+		switch (number) {
+			case  1: numberToPrint = "A"; break;
+			case 11: numberToPrint = "J"; break;
+			case 12: numberToPrint = "Q"; break;
+			case 13: numberToPrint = "K"; break;
+			default: numberToPrint = Integer.toString(number);
+		}
+		switch (shape) {
+			case "heart": shapeToPrint = "♥"; break;
+			case "dia": shapeToPrint = "◊"; break;
+			case "clover": shapeToPrint = "♣"; break;
+			case "spade": shapeToPrint = "♠"; break;
+			default: shapeToPrint = shape;
+		}
+		return shapeToPrint + numberToPrint;
 	}
 }

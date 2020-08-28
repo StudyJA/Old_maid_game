@@ -1,7 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.*;
 
 /**
@@ -14,8 +12,6 @@ public class OldMaidGameApp extends JFrame {
 	static boolean winner   = false; // 승자가 나오면 상태가 true로 바뀌도록 하기
 	ControlPlayer p  = new ControlPlayer();
 	ControlCard   c  = new ControlCard();
-
-
 
 	// 플레이어 설정, 카드 범위 설정, 덱 생성
 	void gameSetting() {
@@ -73,24 +69,36 @@ public class OldMaidGameApp extends JFrame {
 
 }
 
-class Main implements Runnable {
+class Main extends Thread {
 	static OldMaidGameApp game;
 	static Scanner scanner = new Scanner(System.in);
+
+	// 승패 결정
+	void isWin() {
+		Player prevPlayer = game.p.previousPlayer;
+		if (prevPlayer.cardList.size() == 0) {
+			prevPlayer.score++;
+			prevPlayer.panel.removeAll();
+			prevPlayer.panel.add(new JLabel(prevPlayer.name + " is winner!"));
+			this.interrupt();
+		}
+
+	}
+
+
 	public void run() { // 게임의 승자가 나오면 게임을 중지 하고 점수 계산 후 다시 시작할 지 정함
-		System.out.println("* * * * * * * * * * * * * * * * * * * *");
-		System.out.println("Let's play Old maid game!!");
 		try{
-			while (!game.winner) {
-				System.out.println("- - - - - - - - - - - - - -");
+			while(!Thread.currentThread().isInterrupted()) {
 				BoardPanel.showLeft(game.p.currentPlayer.name + "'s turn ");
 				game.p.currentPlayer.draw(game.p.previousPlayer);
-				game.p.currentPlayer.showCards();
+				isWin();
 				game.p.nextPlayer();
 				Thread.sleep(3000);
 			}
+		} catch (InterruptedException e) {
+			// 승자가 나왔을 때
 			for(Player player: game.p.playerList) player.panel.uncover(); // 카드 전부 공개
 			game.p.findJoker(); // 조커 찾기
-			System.out.println("* * * * * * * * * * * * * * * * * * * *");
 			System.out.print("Would you like to exit game? (yes):");
 			if("yes".equals(scanner.next())) {
 				// 1. 덱, 플레이어 초기화
@@ -112,9 +120,6 @@ class Main implements Runnable {
 				Thread tmpThread = new Thread(new Main());
 				tmpThread.start();
 			}
-
-		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
 	}
 

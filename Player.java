@@ -1,4 +1,3 @@
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -19,17 +18,7 @@ public class Player {
 		this.location = location;
 
 	}
-
-	// 플레이어가 카드를 모두 버렸을 경우 승자와 패자 결정 및 점수 계산
-	void isWin() {
-		if (cardList.size() == 0) {
-			panel.removeAll();
-			panel.add(new JLabel(name + " is winner!!", SwingConstants.CENTER));
-			OldMaidGameApp.winner = true;
-			score++;
-		}
-	}
-	
+		
 	public void setCardList(Vector<Card> cardList) { this.cardList = cardList; }
 	public void enableMouseListener() {
 		for(Card card: this.cardList) {
@@ -65,20 +54,15 @@ public class Player {
 				BoardPanel.showRight(message);
 				cardList.remove(card);
 				panel.refresh();
-				isWin();
+				card.setForth();
+				givenCard.setForth();
+				BoardPanel.showCenter(card, givenCard);
 				return;
 			}
 		}
 		// 같은 숫자 카드가 없을 때
 		cardList.add(givenCard);
 		panel.refresh();
-	}
-	
-	// 플레이어의 카드가 몇 장인지 출력
-	public void showCards() {
-		String message = name + ": has " + cardList.size() + " cards\n";
-		BoardPanel.showRight(message);
-		System.out.println();
 	}
 
 	// 게임 시작 전 중복 카드를 모두 제거
@@ -126,7 +110,6 @@ public class Player {
 			card.removeMouseListener(this);
 			cardList.remove(card);
 			panel.refresh();
-			isWin();
 		}
 	}
 }

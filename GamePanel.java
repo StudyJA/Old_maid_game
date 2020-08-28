@@ -6,6 +6,11 @@ import java.awt.*;
  */
 public class GamePanel extends JPanel {
     Player player;
+    GamePanel() {
+        setBackground(new Color(40, 120, 11));
+        setLayout(new FlowLayout());
+    }
+
     GamePanel(Player player) {
         setBackground(Color.white);
         this.player = player;
@@ -15,14 +20,12 @@ public class GamePanel extends JPanel {
 
     public void cover() { // 모든 카드 뒷면 보이기
         for(Card card: player.cardList) card.setBack();
-        this.revalidate();
-        this.repaint();
+        refresh();
     }
 
     public void uncover() { // 모든 카드 앞면 보이기
         for(Card card: player.cardList) card.setForth();
-        this.revalidate();
-        this.repaint();
+        refresh();
     }
 
     public void refresh() {

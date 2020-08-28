@@ -5,7 +5,7 @@ public class BoardPanel extends JPanel {
 	ImageIcon back = new ImageIcon("img/backs.jpg");
 	static JLabel consoleLine = new JLabel("");
 	static JLabel gameSetting = new JLabel("");
-	static JLabel j; // Center
+	static GamePanel board = new GamePanel(); // Center
 	
 	BoardPanel() {
 		setLayout(new GridLayout(1,3));
@@ -15,10 +15,9 @@ public class BoardPanel extends JPanel {
 		gameSetting.setFont(f1);
 		this.add(gameSetting);
 		gameSetting.setHorizontalAlignment(JLabel.CENTER);
-		
-		JLabel j = new JLabel(back);
-        j.setSize(back.getIconWidth(), back.getIconHeight());
-		this.add(j);
+
+		board.add(new JLabel(back));
+        this.add(board);
 		
 		Font f2 = new Font("Arial", Font.BOLD, 17);
 		consoleLine.setFont(f2);
@@ -32,8 +31,12 @@ public class BoardPanel extends JPanel {
 	}
 
 	// 가운데 보드 이미지 출력
-	static public void showCenter(ImageIcon icon) {
-		j.setIcon(icon);
+	static public void showCenter(Card c1, Card c2)
+	{
+		board.removeAll();
+		board.add(c1);
+		board.add(c2);
+		board.repaint();
 	}
 
 	// 오른쪽 보드 게임 설정
