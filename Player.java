@@ -18,7 +18,6 @@ public class Player {
 	Player (String name, int location) {
 		this.name = name;
 		this.location = location;
-
 	}
 		
 	public void setCardList(Vector<Card> cardList) { this.cardList = cardList; }

@@ -11,7 +11,9 @@ public class OldMaidGameApp extends JFrame {
 	static Scanner scanner = new Scanner(System.in);
 	ControlPlayer p = new ControlPlayer();
 	ControlCard c = new ControlCard();
-
+	
+	BoardPanel boardPanel = new BoardPanel(); // GUI
+	
 	// 플레이어 설정, 카드 범위 설정, 덱 생성
 	void gameSetting() {
 		System.out.println("Game setting...");
@@ -59,7 +61,7 @@ public class OldMaidGameApp extends JFrame {
 		gameSetting(); // 콘솔에서 게임 세팅
 		setLayout(new GridLayout(p.totalPlayer + 1, 1)); // 전체 플레이어 수로 세로크기 결정
 		setBackground(Color.white);
-		BoardPanel boardPanel = new BoardPanel(); // GUI
+		BoardPanel.scoreBoard.setLayout(new GridLayout(p.totalPlayer, 1));
 		this.add(boardPanel);
 		// 1. 덱을 섞는다.
 		c.shuffle();
@@ -77,6 +79,9 @@ public class OldMaidGameApp extends JFrame {
 			this.add(each.panel);
 			if (maxSize < each.cardList.size())
 				maxSize = each.cardList.size();
+			
+			BoardPanel.addScoreList(each);
+
 		}
 		// 4. 시작 플레이어 설정
 		p.firstPlayer();
@@ -91,7 +96,8 @@ public class OldMaidGameApp extends JFrame {
 			while (true) {
 				Player prevPlayer = game.p.previousPlayer;
 				Player currentPlayer = game.p.currentPlayer;
-				BoardPanel.showLeft(currentPlayer.name + "'s turn ");
+				BoardPanel.scoreList.get(prevPlayer.location).setBackground(Color.white);
+				BoardPanel.scoreList.get(currentPlayer.location).setBackground(Color.GRAY); // 턴 표시
 				currentPlayer.draw(prevPlayer);
 				try {
 					Thread.sleep(3000);
@@ -100,15 +106,19 @@ public class OldMaidGameApp extends JFrame {
 				}
 				if (prevPlayer.cardList.size() == 0) {
 					prevPlayer.score++;
+					BoardPanel.scoreList.get(prevPlayer.location).setText(prevPlayer.name+": "+prevPlayer.score);
 					prevPlayer.panel.removeAll();
-					prevPlayer.panel.add(new JLabel(prevPlayer.name + " is Winner!!"));
+					//prevPlayer.panel.add(new JLabel(prevPlayer.name + " is Winner!!")); < 이게 적용이 안 되는 것 같아요
+					BoardPanel.showRight(prevPlayer.name + " is Winner!!");
 					break;
 				} else {
 					currentPlayer.dump();
 					if (currentPlayer.cardList.size() == 0) {
 						currentPlayer.score++;
+						BoardPanel.scoreList.get(currentPlayer.location).setText(currentPlayer.name+": "+currentPlayer.score);
 						currentPlayer.panel.removeAll();
-						currentPlayer.panel.add(new JLabel(currentPlayer.name + " is Winner!!"));
+						//currentPlayer.panel.add(new JLabel(currentPlayer.name + " is Winner!!"));
+						BoardPanel.showRight(currentPlayer.name + " is Winner!!");
 						break;
 					}
 					game.p.nextPlayer();
@@ -116,6 +126,7 @@ public class OldMaidGameApp extends JFrame {
 			}
 			for (Player player : game.p.playerList) player.panel.uncover(); // 카드 전부 공개
 			game.p.findJoker(); // 조커 찾기
+			BoardPanel.updateScore(); // 점수 업데이트
 			System.out.print("Would you like to exit game? (yes):");
 			if ("yes".equals(scanner.next())) break;
 			else game.restart();
