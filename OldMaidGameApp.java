@@ -9,6 +9,7 @@ import java.util.*;
 public class OldMaidGameApp extends JFrame {
 
 	static Scanner scanner = new Scanner(System.in);
+	static boolean running = true; // 게임을 재시작 하는데 필요한 플래그
 	ControlPlayer p = new ControlPlayer();
 	ControlCard c = new ControlCard();
 	
@@ -79,10 +80,9 @@ public class OldMaidGameApp extends JFrame {
 			this.add(each.panel);
 			if (maxSize < each.cardList.size())
 				maxSize = each.cardList.size();
-			
-			BoardPanel.addScoreList(each);
 
 		}
+		BoardPanel.addScoreList(p.playerList); // 스코어 보드에 플레이어 정보를 추가
 		// 4. 시작 플레이어 설정
 		p.firstPlayer();
 
@@ -90,46 +90,55 @@ public class OldMaidGameApp extends JFrame {
 		setVisible(true);
 	}
 
-	public static void main(String[] args) {
+	static boolean isWin(Player prevPlayer, Player currentPlayer) {
+		if (prevPlayer.cardList.size() == 0) {
+			prevPlayer.score++;
+			BoardPanel.scoreList.get(prevPlayer.location).setText(prevPlayer.name+": "+prevPlayer.score);
+			prevPlayer.panel.add(new JLabel(prevPlayer.name + " is Winner!!", SwingConstants.CENTER));
+			prevPlayer.panel.revalidate();
+			prevPlayer.panel.repaint();
+			return true;
+		} else {
+			currentPlayer.dump(); // 현재 플레이어가 중복 카드를 버린 후
+			if (currentPlayer.cardList.size() == 0) {
+				currentPlayer.score++;
+				BoardPanel.scoreList.get(currentPlayer.location).setText(currentPlayer.name + ": " + currentPlayer.score);
+				currentPlayer.panel.removeAll();
+				currentPlayer.panel.add(new JLabel(currentPlayer.name + " is Winner!!", SwingConstants.CENTER));
+				currentPlayer.panel.revalidate();
+				currentPlayer.panel.repaint();
+				return true;
+			}
+		}
+		return false; // 승자 없음
+	}
+
+	public static void main(String[] args) throws InterruptedException {
 		OldMaidGameApp game = new OldMaidGameApp();
-		while (true) {
-			while (true) {
+		boolean winner = false; // 승자가 나올때 까지 게임 진행 시키는 플래그
+		while (running) {
+			while (!winner) {
 				Player prevPlayer = game.p.previousPlayer;
 				Player currentPlayer = game.p.currentPlayer;
 				BoardPanel.scoreList.get(prevPlayer.location).setBackground(Color.white);
 				BoardPanel.scoreList.get(currentPlayer.location).setBackground(Color.GRAY); // 턴 표시
 				currentPlayer.draw(prevPlayer);
-				try {
-					Thread.sleep(3000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				if (prevPlayer.cardList.size() == 0) {
-					prevPlayer.score++;
-					BoardPanel.scoreList.get(prevPlayer.location).setText(prevPlayer.name+": "+prevPlayer.score);
-					prevPlayer.panel.removeAll();
-					//prevPlayer.panel.add(new JLabel(prevPlayer.name + " is Winner!!")); < 이게 적용이 안 되는 것 같아요
-					BoardPanel.showRight(prevPlayer.name + " is Winner!!");
-					break;
-				} else {
-					currentPlayer.dump();
-					if (currentPlayer.cardList.size() == 0) {
-						currentPlayer.score++;
-						BoardPanel.scoreList.get(currentPlayer.location).setText(currentPlayer.name+": "+currentPlayer.score);
-						currentPlayer.panel.removeAll();
-						//currentPlayer.panel.add(new JLabel(currentPlayer.name + " is Winner!!"));
-						BoardPanel.showRight(currentPlayer.name + " is Winner!!");
-						break;
-					}
-					game.p.nextPlayer();
-				}
+				
+				Thread.sleep(3000); // 시간 3초 지연
+				
+				winner = isWin(prevPlayer, currentPlayer);
+				game.p.nextPlayer();
 			}
+			game.p.findJoker();
 			for (Player player : game.p.playerList) player.panel.uncover(); // 카드 전부 공개
-			game.p.findJoker(); // 조커 찾기
-			BoardPanel.updateScore(); // 점수 업데이트
+			BoardPanel.updateScoreList(game.p.playerList); // 점수 업데이트
+			BoardPanel.defaultCenter();
 			System.out.print("Would you like to exit game? (yes):");
-			if ("yes".equals(scanner.next())) break;
-			else game.restart();
+			if ("yes".equals(scanner.next())) running = false; // 게임 종료
+			else { // 게임 다시 시작
+				winner = false;
+				game.restart();
+			}
 		}
 
 
