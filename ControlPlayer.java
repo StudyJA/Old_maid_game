@@ -60,7 +60,7 @@ class ControlPlayer {
 		for(Player each : playerList)
 			for(Card card : each.cardList) {
 				if (card.number == 0) {
-					System.out.println(each.name + "has the joker");
+					BoardPanel.showRight(each.name + " has the Joker!!");
 					each.score--;
 				}
 			}
